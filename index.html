@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B Corp Consultant Collaboration Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --ink:#1E2A22;
+    --ink-soft:#4A5A4E;
+    --paper:#F1F4EE;
+    --paper-raised:#FFFFFF;
+    --line:#D8DECF;
+    --forest:#3E6259;
+    --forest-dark:#2A423B;
+    --gold:#C98A2B;
+    --gold-soft:#F3E3C5;
+    --rust:#B5573A;
+    --rust-soft:#F5DED6;
+    --grey-soft:#E7E7E1;
+    --radius:10px;
+    --shadow: 0 2px 10px rgba(30,42,34,0.07);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', -apple-system, sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:600;
+    color:var(--forest-dark);
+    margin:0 0 .3em 0;
+  }
+  a{color:var(--forest-dark);}
+
+  /* ---------- Header ---------- */
+  header.site{
+    background:var(--forest-dark);
+    color:#EFEFE6;
+    padding:2rem 1.5rem 1.6rem;
+  }
+  header.site .wrap{max-width:1200px;margin:0 auto;}
+  header.site h1{
+    color:#fff;
+    font-size:clamp(1.6rem,3vw,2.3rem);
+    letter-spacing:-0.01em;
+  }
+  header.site p{
+    max-width:62ch;
+    color:#CBD6C7;
+    margin:0.4rem 0 0;
+    font-size:0.98rem;
+  }
+  header.site .stat-line{
+    margin-top:1rem;
+    font-size:0.85rem;
+    color:#A9C0A2;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:1200px;
+    margin:0 auto;
+    padding:1.5rem;
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:1.5rem;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Filters panel ---------- */
+  #filterToggle{
+    display:none;
+  }
+  .filters{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.1rem;
+    position:sticky;
+    top:1rem;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .filters h2{font-size:1.05rem;margin-bottom:0.9rem;}
+  .filter-actions{
+    display:flex; gap:.5rem; margin-bottom:1rem;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:0.85rem;
+    font-weight:600;
+    border:1px solid var(--forest-dark);
+    background:var(--forest-dark);
+    color:#fff;
+    padding:0.5rem 0.9rem;
+    border-radius:7px;
+    cursor:pointer;
+  }
+  .btn.secondary{
+    background:transparent;
+    color:var(--forest-dark);
+  }
+  .btn:hover{opacity:0.88;}
+
+  input[type="text"].search{
+    width:100%;
+    padding:0.55rem 0.7rem;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-family:inherit;
+    font-size:0.9rem;
+    margin-bottom:1rem;
+  }
+
+  details.fsection{
+    border-top:1px solid var(--line);
+    padding:0.7rem 0;
+  }
+  details.fsection:first-of-type{border-top:none;}
+  details.fsection summary{
+    cursor:pointer;
+    font-weight:600;
+    font-size:0.92rem;
+    color:var(--forest-dark);
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  details.fsection summary::-webkit-details-marker{display:none;}
+  details.fsection summary::after{
+    content:"+";
+    font-size:1.1rem;
+    color:var(--ink-soft);
+  }
+  details.fsection[open] summary::after{content:"–";}
+  .fsection .help{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin:0.25rem 0 0.6rem;
+  }
+  .fsection .body{padding-top:0.5rem;}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:0.4rem;}
+  label.chk{
+    display:flex;align-items:center;gap:0.4rem;
+    font-size:0.85rem;
+    padding:0.3rem 0;
+    cursor:pointer;
+  }
+  label.chk input{accent-color:var(--forest-dark);}
+
+  table.gridpick{width:100%;border-collapse:collapse;font-size:0.82rem;}
+  table.gridpick th{
+    font-weight:600;color:var(--ink-soft);text-align:center;padding:0.2rem;font-size:0.72rem;
+  }
+  table.gridpick td{padding:0.25rem 0.2rem;}
+  table.gridpick td.rowlabel{text-align:left;font-weight:500;}
+  table.gridpick td{text-align:center;}
+  table.gridpick input{accent-color:var(--forest-dark);}
+
+  select.levelpick{
+    width:100%;
+    font-family:inherit;
+    font-size:0.82rem;
+    padding:0.35rem;
+    border:1px solid var(--line);
+    border-radius:6px;
+    margin-bottom:0.3rem;
+  }
+  .topicrow{margin-bottom:0.5rem;}
+  .topicrow .tname{font-size:0.85rem;font-weight:500;display:block;margin-bottom:0.2rem;}
+
+  /* ---------- Results ---------- */
+  .resultsHead{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:1rem; flex-wrap:wrap; gap:0.6rem;
+  }
+  .resultsHead .count{font-size:0.95rem;color:var(--ink-soft);}
+  .resultsHead select{
+    font-family:inherit;font-size:0.85rem;padding:0.4rem 0.6rem;
+    border:1px solid var(--line);border-radius:7px;background:#fff;
+  }
+
+  .cards{display:flex;flex-direction:column;gap:0.9rem;}
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.1rem 1.2rem;
+    box-shadow:var(--shadow);
+  }
+  .card-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;}
+  .card h3{font-size:1.15rem;margin-bottom:0.1rem;}
+  .card .company{color:var(--ink-soft);font-size:0.92rem;margin-bottom:0.3rem;}
+  .card .loc{color:var(--ink-soft);font-size:0.82rem;}
+
+  .badge{
+    font-size:0.75rem;font-weight:700;
+    padding:0.3rem 0.7rem;border-radius:999px;
+    white-space:nowrap;
+  }
+  .badge.full{background:var(--gold);color:#fff;}
+  .badge.strong{background:var(--gold-soft);color:#8A5A16;border:1px solid var(--gold);}
+  .badge.partial{background:var(--grey-soft);color:var(--ink-soft);border:1px solid var(--line);}
+
+  .tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.7rem;}
+  .tag{
+    background:var(--forest);
+    color:#fff;
+    font-size:0.75rem;
+    padding:0.22rem 0.6rem;
+    border-radius:6px;
+  }
+  .tag.alt{background:#EDF1E9;color:var(--forest-dark);border:1px solid var(--line);}
+
+  .card-actions{margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;}
+  .card-actions a, .card-actions button{
+    font-size:0.82rem;font-weight:600;
+    text-decoration:none;
+    border:1px solid var(--forest-dark);
+    color:var(--forest-dark);
+    background:#fff;
+    padding:0.4rem 0.8rem;
+    border-radius:7px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .card-actions a.primary{background:var(--forest-dark);color:#fff;}
+
+  .empty{
+    text-align:center;padding:3rem 1rem;color:var(--ink-soft);
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(20,28,22,0.55);
+    display:none;align-items:flex-start;justify-content:center;
+    padding:3vh 1rem;overflow-y:auto;z-index:50;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal{
+    background:#fff;border-radius:12px;max-width:680px;width:100%;
+    padding:1.6rem;position:relative;
+  }
+  .modal h2{margin-bottom:0.1rem;}
+  .modal .close{
+    position:absolute;top:1rem;right:1rem;
+    border:none;background:none;font-size:1.4rem;cursor:pointer;color:var(--ink-soft);
+  }
+  .modal section{margin-top:1.1rem;}
+  .modal section h4{font-size:0.85rem;text-transform:none;color:var(--forest-dark);margin-bottom:0.4rem;}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem;font-size:0.85rem;}
+  .kv div span{color:var(--ink-soft);}
+  .modal .notefield{
+    background:var(--paper);border-radius:8px;padding:0.7rem;font-size:0.85rem;white-space:pre-wrap;
+  }
+
+  footer{
+    max-width:1200px;margin:0 auto;padding:2rem 1.5rem 3rem;
+    color:var(--ink-soft);font-size:0.8rem;
+  }
+  footer a{color:var(--forest-dark);}
+
+  .loading, .error{max-width:1200px;margin:2rem auto;padding:0 1.5rem;color:var(--ink-soft);}
+
+  @media (max-width:880px){
+    .filters{position:static;max-height:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <h1>B Corp Consultant Collaboration Directory</h1>
+    <p>Some Text Here IDFK.</p>
+    <div class="stat-line" id="statLine">Loading consultant profiles…</div>
+  </div>
+</header>
+
+<div class="loading" id="loadingMsg">Loading data.csv…</div>
+<div class="error" id="errorMsg" style="display:none;"></div>
+
+<div class="layout" id="appLayout" style="display:none;">
+  <aside class="filters" id="filters">
+    <h2>Find a collaborator</h2>
+    <div class="filter-actions">
+      <button class="btn" id="clearBtn">Clear all filters</button>
+    </div>
+    <input type="text" class="search" id="searchBox" placeholder="Search by name, company or notes…">
+    <div id="filterSections"></div>
+  </aside>
+
+  <main>
+    <div class="resultsHead">
+      <div class="count" id="resultCount"></div>
+      <select id="sortPick">
+        <option value="score">Sort: best match first</option>
+        <option value="name">Sort: name (A–Z)</option>
+      </select>
+    </div>
+    <div class="cards" id="cards"></div>
+  </main>
+</div>
+
+<footer>
+  Data comes from <code>data.csv</code> in this same folder, read directly by your browser — updating that file (re-exporting the survey and replacing it) is all that's needed to refresh this page. Nothing is uploaded anywhere; everything runs on your device.
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+/* ============================================================
+   1. CONSTANTS describing the shape of the survey
+   ============================================================ */
+const SIZE_ORDER = ["Company without workers","Micro","Small","Medium","Large","X Large","XX Large"];
+const LEVEL_ORDER = [
+  "Familiar with the basic concepts",
+  "Comfortable verifying MOST of the standards",
+  "Comfortable verifying ALL of the standards",
+  "Could lead a workshop on the standards"
+];
+const MODE_MAP = {
+  "I currently offer this":"offer",
+  "I do this for all projects":"always",
+  "I prefer doing this":"prefer",
+  "I generally seek a partner on this":"seekPartner",
+  "I am willing to subcontract this":"subcontract"
+};
+const MODE_LABELS = {
+  offer:"Offers this", always:"Does this on every project", prefer:"Prefers this work",
+  seekPartner:"Usually wants a partner for this", subcontract:"Open to subcontracting this out"
+};
+
+/* ============================================================
+   2. LOAD + PARSE
+   ============================================================ */
+function findCols(headers, keyword){
+  const out = [];
+  headers.forEach((h,i)=>{
+    if (h && h.includes(keyword)) out.push({index:i, parts:h.split(':')});
+  });
+  return out;
+}
+
+function collectOtherWriteIns(cols){
+  // "Other - Write In" columns come as N checkbox columns followed by N matching text columns
+  const others = cols.filter(c => c.parts[0].trim() === 'Other - Write In');
+  const half = others.length/2;
+  const pairs = [];
+  for(let i=0;i<half;i++){
+    pairs.push({checkIdx: others[i].index, textIdx: others[half+i].index});
+  }
+  return pairs;
+}
+
+function buildData(headers, rows){
+  const sizeCols = findCols(headers, "What size companies are you working with or have worked with").filter(c=>c.parts[1]!=='None');
+  const sizePrefCols = findCols(headers, "What size companies do you prefer to work with and which size are you most likely to want support").filter(c=>c.parts[1]!=='None');
+  const topicCols = findCols(headers, "What is your level of experience/expertise with the concepts for each Impact Topic");
+  const workCols = findCols(headers, "For each type of work in the rows below, please indicate how you approach work on B Corp certifications");
+  const smeColsAll = findCols(headers, "Are you interested in providing subject matter expertise and guidance/direction to other consultants");
+  const networkColsAll = findCols(headers, "would you most like to receive from this consultant network");
+  const availCols = findCols(headers, "availability to provide the following support for other consultants");
+  const servicesColsAll = findCols(headers, "What services do you provide beyond B Corp consulting");
+  const collabCols = findCols(headers, "how do you prefer to structure the relationship");
+  const noteCol = findCols(headers, "Please share any additional information")[0];
+
+  const smeCols = smeColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
+  const smeOther = collectOtherWriteIns(smeColsAll);
+  const networkCols = networkColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
+  const servicesCols = servicesColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
+  const servicesOther = collectOtherWriteIns(servicesColsAll);
+
+  const workTypes = [...new Set(workCols.map(c=>c.parts[1]))];
+  const topicNames = topicCols.map(c=>c.parts[0]);
+  const smeOptions = [...new Set(smeCols.map(c=>c.parts[0]))];
+  const networkOptions = [...new Set(networkCols.map(c=>c.parts[0]))];
+  const availTypes = [...new Set(availCols.map(c=>c.parts[0]))];
+  const availTimeframes = [...new Set(rows.flatMap(r=>availCols.map(c=>r[c.index])).filter(Boolean))];
+  const serviceOptions = [...new Set(servicesCols.map(c=>c.parts[0]))];
+  const collabTypes = [...new Set(collabCols.map(c=>c.parts[0]))];
+
+  const idx = {
+    name: headers.indexOf('Your Name'),
+    company: headers.indexOf('Company Name'),
+    email: headers.indexOf('Your Email'),
+    city: headers.indexOf('City'),
+    state: headers.indexOf('State/Region'),
+    country: headers.indexOf('Country')
+  };
+
+  const consultants = rows.filter(r=>r[idx.name]).map((r,i)=>{
+    const c = {
+      id:i, name:r[idx.name], company:r[idx.company]||'', email:r[idx.email]||'',
+      city:r[idx.city]||'', state:r[idx.state]||'', country:r[idx.country]||'',
+      sizes:{}, sizePref:{}, topics:{}, workApproach:{}, sme:[], smeOtherText:'',
+      network:[], availability:{}, services:[], servicesOtherText:'', collab:{}, note:''
+    };
+    SIZE_ORDER.forEach(s=>{ c.sizes[s]={v1:false,v2:false}; c.sizePref[s]={preferred:false, likely:false}; });
+    sizeCols.forEach(col=>{
+      const version = col.parts[0].startsWith('v1') ? 'v1':'v2';
+      if(r[col.index]) c.sizes[col.parts[1]][version] = true;
+    });
+    sizePrefCols.forEach(col=>{
+      const attr = col.parts[0].startsWith('Preferred') ? 'preferred':'likely';
+      if(r[col.index]) c.sizePref[col.parts[1]][attr] = true;
+    });
+    topicCols.forEach(col=>{ if(r[col.index]) c.topics[col.parts[0]] = r[col.index]; });
+    workTypes.forEach(t=>c.workApproach[t]={});
+    workCols.forEach(col=>{
+      const mode = MODE_MAP[col.parts[0]];
+      if(r[col.index]) c.workApproach[col.parts[1]][mode]=true;
+    });
+    smeCols.forEach(col=>{ if(r[col.index]) c.sme.push(col.parts[0]); });
+    smeOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.smeOtherText = r[p.textIdx]; });
+    networkCols.forEach(col=>{ if(r[col.index]) c.network.push(col.parts[0]); });
+    availCols.forEach(col=>{ if(r[col.index]) c.availability[col.parts[0]] = r[col.index]; });
+    servicesCols.forEach(col=>{ if(r[col.index]) c.services.push(col.parts[0]); });
+    servicesOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.servicesOtherText = r[p.textIdx]; });
+    collabCols.forEach(col=>{ if(r[col.index]) c.collab[col.parts[0]] = r[col.index]; });
+    if(noteCol) c.note = r[noteCol.index]||'';
+    return c;
+  });
+
+  return {
+    consultants,
+    options:{ workTypes, topicNames, smeOptions, networkOptions, availTypes, availTimeframes, serviceOptions, collabTypes }
+  };
+}
+
+/* ============================================================
+   3. STATE
+   ============================================================ */
+let DATA = null;
+
+const state = {
+  search:'',
+  sizes:new Set(),        // "Large|v2" style keys
+  topicMin:{},            // topicName -> level string
+  work:{},                // workType -> mode string
+  sme:new Set(),
+  network:new Set(),
+  avail:new Set(),        // "supportType|timeframe" keys
+  services:new Set(),
+  collab:new Set(),       // structureType, satisfied if Yes/Maybe
+  sort:'score'
+};
+
+/* ============================================================
+   4. FILTER PANEL RENDERING
+   ============================================================ */
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
+
+function renderFilters(){
+  const wrap = document.getElementById('filterSections');
+  wrap.innerHTML = '';
+
+  // -- Company size + standards version --
+  const sizeRows = SIZE_ORDER.map(s=>`
+    <tr>
+      <td class="rowlabel">${s}</td>
+      <td><input type="checkbox" data-group="sizes" data-key="${s}|v1"></td>
+      <td><input type="checkbox" data-group="sizes" data-key="${s}|v2"></td>
+    </tr>`).join('');
+  wrap.appendChild(el(`
+    <details class="fsection" open>
+      <summary>Company size &amp; standards experience</summary>
+      <div class="body">
+        <p class="help">Checking multiple boxes finds anyone with any one of them.</p>
+        <table class="gridpick">
+          <tr><th></th><th>v1</th><th>v2</th></tr>
+          ${sizeRows}
+        </table>
+      </div>
+    </details>`));
+
+  // -- Impact topic depth --
+  const topicRows = DATA.options.topicNames.map(t=>`
+    <div class="topicrow">
+      <span class="tname">${t}</span>
+      <select class="levelpick" data-group="topicMin" data-key="${t}">
+        <option value="">Any level / not needed</option>
+        ${LEVEL_ORDER.map(l=>`<option value="${l}">${l}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>Impact topic depth of knowledge</summary>
+      <div class="body">
+        <p class="help">Pick the minimum depth you need for any topic that matters to your project.</p>
+        ${topicRows}
+      </div>
+    </details>`));
+
+  // -- Work approach --
+  const modeKeys = Object.keys(MODE_LABELS);
+  const workRows = DATA.options.workTypes.map(t=>`
+    <div class="topicrow">
+      <span class="tname">${t}</span>
+      <select class="levelpick" data-group="workMode" data-key="${t}">
+        <option value="">Any approach / not needed</option>
+        ${modeKeys.map(m=>`<option value="${m}">${MODE_LABELS[m]}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>How they approach the work</summary>
+      <div class="body">
+        <p class="help">Description IDK.</p>
+        ${workRows}
+      </div>
+    </details>`));
+
+  // -- Mentoring interest --
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>Willing to mentor / advise other consultants</summary>
+      <div class="body">
+        <p class="help">Text Here IDK.</p>
+        <div class="chip-row">
+          ${DATA.options.smeOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="sme" data-key="${o}"> ${o}</label>`).join('')}
+        </div>
+      </div>
+    </details>`));
+
+  // -- What they want from the network (useful for finding peers with shared goals) --
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>What they're looking for from the network</summary>
+      <div class="body">
+        <p class="help">Text Here IIDK.</p>
+        <div class="chip-row">
+          ${DATA.options.networkOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="network" data-key="${o}"> ${o}</label>`).join('')}
+        </div>
+      </div>
+    </details>`));
+
+  // -- Availability --
+  const availRows = DATA.options.availTypes.map(t=>`
+    <div class="topicrow">
+      <span class="tname">${t}</span>
+      <div class="chip-row">
+        ${DATA.options.availTimeframes.map(tf=>`<label class="chk"><input type="checkbox" data-group="avail" data-key="${t}|${tf}"> ${tf}</label>`).join('')}
+      </div>
+    </div>`).join('');
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>Availability</summary>
+      <div class="body">
+        <p class="help">Pick the kind of help you need and when you need it by.</p>
+        ${availRows}
+      </div>
+    </details>`));
+
+  // -- Services beyond B Corp --
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>Services beyond B Corp certification</summary>
+      <div class="body">
+        <p class="help">Description IIDK</p>
+        <div class="chip-row">
+          ${DATA.options.serviceOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="services" data-key="${o}"> ${o}</label>`).join('')}
+        </div>
+      </div>
+    </details>`));
+
+  // -- Collaboration structure --
+  wrap.appendChild(el(`
+    <details class="fsection">
+      <summary>Preferred way of collaborating</summary>
+      <div class="body">
+        <p class="help">DEscription IDK</p>
+        <div class="chip-row">
+          ${DATA.options.collabTypes.map(o=>`<label class="chk"><input type="checkbox" data-group="collab" data-key="${o}"> ${o}</label>`).join('')}
+        </div>
+      </div>
+    </details>`));
+
+  wrap.querySelectorAll('input[type="checkbox"][data-group]').forEach(inp=>{
+    inp.addEventListener('change', onCheckboxChange);
+  });
+  wrap.querySelectorAll('select[data-group="topicMin"]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const key = sel.dataset.key;
+      if(sel.value) state.topicMin[key] = sel.value;
+      else delete state.topicMin[key];
+      renderResults();
+    });
+  });
+  wrap.querySelectorAll('select[data-group="workMode"]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const key = sel.dataset.key;
+      if(sel.value) state.work[key] = sel.value;
+      else delete state.work[key];
+      renderResults();
+    });
+  });
+}
+
+function onCheckboxChange(e){
+  const group = e.target.dataset.group;
+  const key = e.target.dataset.key;
+  const set = state[group];
+  if(e.target.checked) set.add(key); else set.delete(key);
+  renderResults();
+}
+
+/* ============================================================
+   5. MATCHING
+   ============================================================ */
+function levelRank(l){ return LEVEL_ORDER.indexOf(l); }
+
+// returns {active: bool sections used, satisfied, total} scoring info per consultant
+function scoreConsultant(c){
+  let satisfied = 0, total = 0;
+  let sectionsFailed = 0, sectionsActive = 0;
+
+  // sizes: OR within section
+  if(state.sizes.size){
+    sectionsActive++;
+    let any=false;
+    state.sizes.forEach(key=>{
+      const [size,ver] = key.split('|');
+      total++;
+      if(c.sizes[size] && c.sizes[size][ver]){ satisfied++; any=true; }
+    });
+    if(!any) sectionsFailed++;
+  }
+
+  // topics: minimum level, OR-within-section for "does it satisfy at least one requested topic"
+  const topicKeys = Object.keys(state.topicMin);
+  if(topicKeys.length){
+    sectionsActive++;
+    let any=false;
+    topicKeys.forEach(t=>{
+      total++;
+      const need = levelRank(state.topicMin[t]);
+      const have = levelRank(c.topics[t]);
+      if(have>=0 && have>=need){ satisfied++; any=true; }
+    });
+    if(!any) sectionsFailed++;
+  }
+
+  const workKeys = Object.keys(state.work);
+  if(workKeys.length){
+    sectionsActive++;
+    let any=false;
+    workKeys.forEach(type=>{
+      total++;
+      const mode = state.work[type];
+      if(c.workApproach[type] && c.workApproach[type][mode]){ satisfied++; any=true; }
+    });
+    if(!any) sectionsFailed++;
+  }
+
+  if(state.sme.size){
+    sectionsActive++;
+    let any=false;
+    state.sme.forEach(k=>{ total++; if(c.sme.includes(k)){satisfied++; any=true;} });
+    if(!any) sectionsFailed++;
+  }
+
+  if(state.network.size){
+    sectionsActive++;
+    let any=false;
+    state.network.forEach(k=>{ total++; if(c.network.includes(k)){satisfied++; any=true;} });
+    if(!any) sectionsFailed++;
+  }
+
+  if(state.avail.size){
+    sectionsActive++;
+    let any=false;
+    state.avail.forEach(key=>{
+      const [type,tf]=key.split('|');
+      total++;
+      if(c.availability[type]===tf){ satisfied++; any=true; }
+    });
+    if(!any) sectionsFailed++;
+  }
+
+  if(state.services.size){
+    sectionsActive++;
+    let any=false;
+    state.services.forEach(k=>{ total++; if(c.services.includes(k)){satisfied++; any=true;} });
+    if(!any) sectionsFailed++;
+  }
+
+  if(state.collab.size){
+    sectionsActive++;
+    let any=false;
+    state.collab.forEach(k=>{
+      total++;
+      const v = c.collab[k];
+      if(v==='Yes' || v==='Maybe'){ satisfied++; any=true; }
+    });
+    if(!any) sectionsFailed++;
+  }
+
+  const pct = total ? Math.round((satisfied/total)*100) : null;
+  return { pct, sectionsActive, sectionsFailed, qualifies: sectionsFailed===0 };
+}
+
+function badgeFor(pct){
+  if(pct===100) return {cls:'full', label:'Full match'};
+  if(pct>=60) return {cls:'strong', label:'Strong match'};
+  return {cls:'partial', label:'Partial match'};
+}
+
+/* ============================================================
+   6. RESULTS RENDERING
+   ============================================================ */
+function matchesSearch(c){
+  if(!state.search) return true;
+  const q = state.search.toLowerCase();
+  return (c.name+' '+c.company+' '+c.note).toLowerCase().includes(q);
+}
+
+function topExpertiseTags(c){
+  return Object.entries(c.topics)
+    .filter(([,lvl])=>levelRank(lvl)>=2)
+    .map(([topic])=>topic.replace(/\s*\([A-Z]+\)$/,''));
+}
+
+function sizesWorkedTags(c){
+  return SIZE_ORDER.filter(s=>c.sizes[s].v1||c.sizes[s].v2)
+    .map(s=>{
+      const v = [];
+      if(c.sizes[s].v1) v.push('v1');
+      if(c.sizes[s].v2) v.push('v2');
+      return `${s} (${v.join('/')})`;
+    });
+}
+
+function renderResults(){
+  const anyActive = state.sizes.size||Object.keys(state.topicMin).length||Object.keys(state.work).length||state.sme.size||state.network.size||state.avail.size||state.services.size||state.collab.size;
+
+  let list = DATA.consultants.filter(matchesSearch).map(c=>{
+    const s = scoreConsultant(c);
+    return {c, s};
+  });
+
+  if(anyActive){
+    list = list.filter(x=>x.s.qualifies);
+  }
+
+  if(state.sort==='score' && anyActive){
+    list.sort((a,b)=> (b.s.pct ?? 0) - (a.s.pct ?? 0) || a.c.name.localeCompare(b.c.name));
+  } else {
+    list.sort((a,b)=>a.c.name.localeCompare(b.c.name));
+  }
+
+  document.getElementById('resultCount').textContent =
+    `${list.length} consultant${list.length===1?'':'s'} ${anyActive ? 'match your criteria' : 'in the directory'}`;
+
+  const cardsEl = document.getElementById('cards');
+  if(!list.length){
+    cardsEl.innerHTML = `<div class="empty">No one matches all of those filters yet. Try loosening a criterion, or check back after the next data update.</div>`;
+    return;
+  }
+
+  cardsEl.innerHTML = list.map(({c,s})=>{
+    const badge = anyActive && s.pct!==null ? badgeFor(s.pct) : null;
+    const loc = [c.city,c.state,c.country].filter(Boolean).join(', ');
+    const exp = topExpertiseTags(c).slice(0,4);
+    const sizes = sizesWorkedTags(c).slice(0,4);
+    return `
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <h3>${c.name}</h3>
+          <div class="company">${c.company}</div>
+          ${loc?`<div class="loc">${loc}</div>`:''}
+        </div>
+        ${badge?`<span class="badge ${badge.cls}">${badge.label}</span>`:''}
+      </div>
+      <div class="tags">
+        ${sizes.map(t=>`<span class="tag">${t}</span>`).join('')}
+        ${exp.map(t=>`<span class="tag alt">${t}</span>`).join('')}
+      </div>
+      <div class="card-actions">
+        <button class="primary" onclick="openProfile(${c.id})">View full profile</button>
+        ${c.email?`<a href="mailto:${c.email}">Email</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   7. PROFILE MODAL
+   ============================================================ */
+function openProfile(id){
+  const c = DATA.consultants.find(x=>x.id===id);
+  const loc = [c.city,c.state,c.country].filter(Boolean).join(', ');
+
+  const sizesHtml = SIZE_ORDER.map(s=>{
+    const w = c.sizes[s];
+    const p = c.sizePref[s];
+    if(!w.v1 && !w.v2 && !p.preferred && !p.likely) return '';
+    let bits = [];
+    if(w.v1) bits.push('v1 experience');
+    if(w.v2) bits.push('v2 experience');
+    if(p.preferred) bits.push('preferred size');
+    if(p.likely) bits.push('likely to want support here');
+    return `<div>${s}: ${bits.join(', ')}</div>`;
+  }).filter(Boolean).join('') || '<div>No sizes indicated.</div>';
+
+  const topicsHtml = Object.entries(c.topics).map(([t,l])=>`<div><span>${t}:</span> ${l}</div>`).join('') || '<div>Not answered.</div>';
+
+  const workHtml = Object.entries(c.workApproach).map(([type,modes])=>{
+    const active = Object.keys(modes);
+    if(!active.length) return '';
+    return `<div>${type}: ${active.map(m=>MODE_LABELS[m]).join('; ')}</div>`;
+  }).filter(Boolean).join('') || '<div>Not answered.</div>';
+
+  const availHtml = Object.entries(c.availability).map(([t,tf])=>`<div>${t}: ${tf}</div>`).join('') || '<div>Not answered.</div>';
+  const collabHtml = Object.entries(c.collab).map(([t,v])=>`<div>${t}: ${v}</div>`).join('') || '<div>Not answered.</div>';
+
+  document.getElementById('modalBody').innerHTML = `
+    <button class="close" onclick="closeProfile()">&times;</button>
+    <h2>${c.name}</h2>
+    <div class="company" style="color:var(--ink-soft)">${c.company}${loc?' · '+loc:''}</div>
+    ${c.email?`<div style="margin-top:0.3rem;"><a href="mailto:${c.email}">${c.email}</a></div>`:''}
+
+    <section>
+      <h4>Company sizes &amp; standards experience</h4>
+      <div class="kv" style="grid-template-columns:1fr;">${sizesHtml}</div>
+    </section>
+    <section>
+      <h4>Impact topic depth of knowledge</h4>
+      <div class="kv" style="grid-template-columns:1fr;">${topicsHtml}</div>
+    </section>
+    <section>
+      <h4>How they approach the work</h4>
+      <div class="kv" style="grid-template-columns:1fr;">${workHtml}</div>
+    </section>
+    <section>
+      <h4>Mentoring other consultants</h4>
+      <div class="tags">${c.sme.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
+      ${c.smeOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.smeOtherText}</div>`:''}
+    </section>
+    <section>
+      <h4>Looking for from the network</h4>
+      <div class="tags">${c.network.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
+    </section>
+    <section>
+      <h4>Availability</h4>
+      <div class="kv" style="grid-template-columns:1fr;">${availHtml}</div>
+    </section>
+    <section>
+      <h4>Services beyond B Corp</h4>
+      <div class="tags">${c.services.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
+      ${c.servicesOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.servicesOtherText}</div>`:''}
+    </section>
+    <section>
+      <h4>Preferred collaboration structure</h4>
+      <div class="kv" style="grid-template-columns:1fr;">${collabHtml}</div>
+    </section>
+    ${c.note?`<section><h4>In their own words</h4><div class="notefield">${c.note}</div></section>`:''}
+  `;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function closeProfile(){ document.getElementById('modalBackdrop').classList.remove('open'); }
+document.getElementById('modalBackdrop').addEventListener('click', e=>{
+  if(e.target.id==='modalBackdrop') closeProfile();
+});
+
+/* ============================================================
+   8. WIRE UP + LOAD
+   ============================================================ */
+document.getElementById('searchBox').addEventListener('input', e=>{
+  state.search = e.target.value;
+  renderResults();
+});
+document.getElementById('sortPick').addEventListener('change', e=>{
+  state.sort = e.target.value;
+  renderResults();
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  state.search=''; state.sizes.clear(); state.topicMin={}; state.work={};
+  state.sme.clear(); state.network.clear(); state.avail.clear();
+  state.services.clear(); state.collab.clear();
+  document.getElementById('searchBox').value='';
+  renderFilters();
+  renderResults();
+});
+
+fetch('data.csv')
+  .then(r=>{
+    if(!r.ok) throw new Error('data.csv not found (' + r.status + ')');
+    return r.text();
+  })
+  .then(text=>{
+    const parsed = Papa.parse(text, {skipEmptyLines:true});
+    const rows = parsed.data;
+    const headers = rows[0];
+    const dataRows = rows.slice(1);
+    DATA = buildData(headers, dataRows);
+
+    document.getElementById('loadingMsg').style.display='none';
+    document.getElementById('appLayout').style.display='grid';
+    document.getElementById('statLine').textContent =
+      `${DATA.consultants.length} consultant${DATA.consultants.length===1?'':'s'} in the directory · updated whenever data.csv is replaced`;
+
+    renderFilters();
+    renderResults();
+  })
+  .catch(err=>{
+    document.getElementById('loadingMsg').style.display='none';
+    const e = document.getElementById('errorMsg');
+    e.style.display='block';
+    e.textContent = 'Could not load data.csv: ' + err.message + '. Make sure data.csv is in the same folder as this page.';
+  });
+</script>
+</body>
+</html>
