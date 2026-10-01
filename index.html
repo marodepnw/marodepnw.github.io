@@ -381,7 +381,7 @@ function buildData(headers, rows){
   const workCols = findCols(headers, "For each type of work in the rows below, please indicate how you approach work on B Corp certifications");
   const smeColsAll = findCols(headers, "Are you interested in providing subject matter expertise and guidance/direction to other consultants");
   const networkColsAll = findCols(headers, "would you most like to receive from this consultant network");
-  const availCols = findCols(headers, "availability to provide the following support for other consultants");
+  const availCols = findCols(headers, "What support would you most like to provide to other consultants");
   const servicesColsAll = findCols(headers, "What services do you provide beyond B Corp consulting");
   const collabCols = findCols(headers, "how do you prefer to structure the relationship");
   const noteCol = findCols(headers, "Please share any additional information")[0];
@@ -397,7 +397,12 @@ function buildData(headers, rows){
   const smeOptions = [...new Set(smeCols.map(c=>c.parts[0]))];
   const networkOptions = [...new Set(networkCols.map(c=>c.parts[0]))];
   const availTypes = [...new Set(availCols.map(c=>c.parts[0]))];
-  const availTimeframes = [...new Set(rows.flatMap(r=>availCols.map(c=>r[c.index])).filter(Boolean))];
+  // Filter options: hide "Not interested"; list "Available now", then quarters in date order, then "Depends on the scope"
+  const AVAIL_HIDDEN = ['Not interested in providing this type of support'];
+  const quarterKey = tf => { const m = tf.match(/^Q([1-4]) (\d{4})$/); return tf==='Available now' ? -Infinity : m ? m[2]*10 + (+m[1]) : Infinity; };
+  const availTimeframes = [...new Set(rows.flatMap(r=>availCols.map(c=>r[c.index])).filter(Boolean))]
+    .filter(tf => !AVAIL_HIDDEN.includes(tf))
+    .sort((a,b) => (a==='Depends on the scope') - (b==='Depends on the scope') || quarterKey(a) - quarterKey(b));
   const serviceOptions = [...new Set(servicesCols.map(c=>c.parts[0]))];
   const collabTypes = [...new Set(collabCols.map(c=>c.parts[0]))];
 
