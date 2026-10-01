@@ -73,7 +73,7 @@
     margin:0 auto;
     padding:1.5rem;
     display:grid;
-    grid-template-columns:300px 1fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:1.5rem;
     align-items:start;
   }
@@ -184,6 +184,13 @@
     border-radius:6px;
     margin-bottom:0.3rem;
   }
+  table.gridpick.levels th{font-size:0.68rem;line-height:1.2;vertical-align:bottom;width:4.6rem;}
+  table.gridpick.levels td.rowlabel{font-size:0.8rem;padding-right:0.5rem;}
+  @media (max-width:480px){
+    table.gridpick.levels th{font-size:0.6rem;width:3.4rem;padding:0.1rem;}
+    table.gridpick.levels td.rowlabel{font-size:0.75rem;}
+  }
+  table.gridpick.levels tr + tr td{border-top:1px solid var(--line);}
   .topicrow{margin-bottom:0.5rem;}
   .topicrow .tname{font-size:0.85rem;font-weight:500;display:block;margin-bottom:0.2rem;}
 
@@ -342,6 +349,8 @@ const LEVEL_ORDER = [
   "Comfortable verifying ALL of the standards",
   "Could lead a workshop on the standards"
 ];
+// Column headings for the Impact Topic matrix (same order as LEVEL_ORDER)
+const LEVEL_SHORT = ["Familiar with basic concepts","Verifies MOST standards","Verifies ALL standards","Could lead a workshop"];
 const MODE_MAP = {
   "I currently offer this":"offer",
   "I do this for all projects":"always",
@@ -507,13 +516,10 @@ function renderFilters(){
 
   // -- Impact topic depth --
   const topicRows = DATA.options.topicNames.map(t=>`
-    <div class="topicrow">
-      <span class="tname">${t}</span>
-      <select class="levelpick" data-group="topicMin" data-key="${t}">
-        <option value="">Any level / not needed</option>
-        ${LEVEL_ORDER.map(l=>`<option value="${l}">${l}</option>`).join('')}
-      </select>
-    </div>`).join('');
+    <tr>
+      <td class="rowlabel">${t}</td>
+      ${LEVEL_ORDER.map(l=>`<td><input type="checkbox" data-group="topicPick" data-topic="${t}" data-level="${l}" title="${l}"></td>`).join('')}
+    </tr>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
       <summary>Impact Topic Knowledge</summary>
@@ -521,7 +527,10 @@ function renderFilters(){
         <p class="help">Pick the minimum depth of knowledge you need for the specific topic. Consultants with a depth of knowledge exceeding the selection will automatically be included.
 
 This field reflects a consultants ability to interpret the standards, evaluate documentation relative to the standards, and ability to complete client deliverables.</p>
-        ${topicRows}
+        <table class="gridpick levels">
+          <tr><th></th>${LEVEL_SHORT.map(l=>`<th>${l}</th>`).join('')}</tr>
+          ${topicRows}
+        </table>
       </div>
     </details>`));
 
@@ -609,14 +618,17 @@ This field reflects a consultants ability to interpret the standards, evaluate d
       </div>
     </details>`));
 
-  wrap.querySelectorAll('input[type="checkbox"][data-group]').forEach(inp=>{
+  wrap.querySelectorAll('input[type="checkbox"][data-group]:not([data-group="topicPick"])').forEach(inp=>{
     inp.addEventListener('change', onCheckboxChange);
   });
-  wrap.querySelectorAll('select[data-group="topicMin"]').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const key = sel.dataset.key;
-      if(sel.value) state.topicMin[key] = sel.value;
-      else delete state.topicMin[key];
+  // Impact topic matrix: the lowest level checked in a row is that topic's minimum
+  wrap.querySelectorAll('input[data-group="topicPick"]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const t = inp.dataset.topic;
+      const checked = [...wrap.querySelectorAll('input[data-group="topicPick"]:checked')]
+        .filter(i=>i.dataset.topic===t).map(i=>levelRank(i.dataset.level));
+      if(checked.length) state.topicMin[t] = LEVEL_ORDER[Math.min(...checked)];
+      else delete state.topicMin[t];
       renderResults();
     });
   });
