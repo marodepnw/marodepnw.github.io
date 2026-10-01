@@ -518,7 +518,7 @@ function renderFilters(){
   const topicRows = DATA.options.topicNames.map(t=>`
     <tr>
       <td class="rowlabel">${t}</td>
-      ${LEVEL_ORDER.map(l=>`<td><input type="checkbox" data-group="topicPick" data-topic="${t}" data-level="${l}" title="${l}"></td>`).join('')}
+      ${LEVEL_ORDER.map(l=>`<td><input type="radio" name="topic-${t}" data-group="topicPick" data-topic="${t}" data-level="${l}" title="${l}"></td>`).join('')}
     </tr>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
@@ -621,14 +621,16 @@ This field reflects a consultants ability to interpret the standards, evaluate d
   wrap.querySelectorAll('input[type="checkbox"][data-group]:not([data-group="topicPick"])').forEach(inp=>{
     inp.addEventListener('change', onCheckboxChange);
   });
-  // Impact topic matrix: the lowest level checked in a row is that topic's minimum
+  // Impact topic matrix: one minimum level per topic; clicking the selected circle again clears the row
   wrap.querySelectorAll('input[data-group="topicPick"]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
+    inp.addEventListener('click', ()=>{
       const t = inp.dataset.topic;
-      const checked = [...wrap.querySelectorAll('input[data-group="topicPick"]:checked')]
-        .filter(i=>i.dataset.topic===t).map(i=>levelRank(i.dataset.level));
-      if(checked.length) state.topicMin[t] = LEVEL_ORDER[Math.min(...checked)];
-      else delete state.topicMin[t];
+      if(state.topicMin[t] === inp.dataset.level){
+        inp.checked = false;
+        delete state.topicMin[t];
+      } else {
+        state.topicMin[t] = inp.dataset.level;
+      }
       renderResults();
     });
   });
