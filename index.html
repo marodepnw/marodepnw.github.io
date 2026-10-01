@@ -300,6 +300,7 @@ The concept for this directory was created by Measure Meant in collaboration wit
 <div class="layout" id="appLayout" style="display:none;">
   <aside class="filters" id="filters">
     <h2>Find a collaborator</h2>
+    <p> Use the filter criteria below to find a partner that aligns with your specific project and support needs. Selecting multiple criteria will narrow the search results.</p>
     <div class="filter-actions">
       <button class="btn" id="clearBtn">Clear all filters</button>
     </div>
@@ -504,9 +505,11 @@ function renderFilters(){
     </div>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>Impact topic depth of knowledge</summary>
+      <summary>Impact Topic Knowledge</summary>
       <div class="body">
-        <p class="help">Pick the minimum depth you need for any topic that matters to your project.</p>
+        <p class="help">Pick the minimum depth of knowledge you need for the specific topic. Consultants with a depth of knowledge exceeding the selection will automatically be included.
+
+This field reflects a consultants ability to interpret the standards, evaluate documentation relative to the standards, and ability to complete client deliverables.</p>
         ${topicRows}
       </div>
     </details>`));
@@ -523,9 +526,9 @@ function renderFilters(){
     </div>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>How they approach the work</summary>
+      <summary>Work Approach</summary>
       <div class="body">
-        <p class="help">Description IDK.</p>
+        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification.</p>
         ${workRows}
       </div>
     </details>`));
@@ -533,9 +536,9 @@ function renderFilters(){
   // -- Mentoring interest --
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>Willing to mentor / advise other consultants</summary>
+      <summary>Mentoring / Thought Partner</summary>
       <div class="body">
-        <p class="help">Text Here IDK.</p>
+        <p class="help">Determine if and how another consultant is willing to provide advice and support.</p>
         <div class="chip-row">
           ${DATA.options.smeOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="sme" data-key="${o}"> ${o}</label>`).join('')}
         </div>
@@ -545,9 +548,9 @@ function renderFilters(){
   // -- What they want from the network (useful for finding peers with shared goals) --
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>What they're looking for from the network</summary>
+      <summary>Offer Support</summary>
       <div class="body">
-        <p class="help">Text Here IIDK.</p>
+        <p class="help">Use this filter if you want to offer support to another consultant. This field indicates the type of support a consultant would like to receive from a partner.</p>
         <div class="chip-row">
           ${DATA.options.networkOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="network" data-key="${o}"> ${o}</label>`).join('')}
         </div>
@@ -564,9 +567,9 @@ function renderFilters(){
     </div>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>Availability</summary>
+      <summary>Request Support</summary>
       <div class="body">
-        <p class="help">Pick the kind of help you need and when you need it by.</p>
+        <p class="help">Use this filter to select the support you want to request from a consultant.</p>
         ${availRows}
       </div>
     </details>`));
@@ -574,9 +577,9 @@ function renderFilters(){
   // -- Services beyond B Corp --
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>Services beyond B Corp certification</summary>
+      <summary>Other Services</summary>
       <div class="body">
-        <p class="help">Description IIDK</p>
+        <p class="help">These are services that consultants provide beyond B Corp Certification.</p>
         <div class="chip-row">
           ${DATA.options.serviceOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="services" data-key="${o}"> ${o}</label>`).join('')}
         </div>
@@ -586,9 +589,9 @@ function renderFilters(){
   // -- Collaboration structure --
   wrap.appendChild(el(`
     <details class="fsection">
-      <summary>Preferred way of collaborating</summary>
+      <summary>Collaboration Preference</summary>
       <div class="body">
-        <p class="help">DEscription IDK</p>
+        <p class="help">This field indicates how a consultant prefers to partner on projects.</p>
         <div class="chip-row">
           ${DATA.options.collabTypes.map(o=>`<label class="chk"><input type="checkbox" data-group="collab" data-key="${o}"> ${o}</label>`).join('')}
         </div>
@@ -845,33 +848,33 @@ function openProfile(id){
       <div class="kv" style="grid-template-columns:1fr;">${sizesHtml}</div>
     </section>
     <section>
-      <h4>Impact topic depth of knowledge</h4>
+      <h4>Impact Topic Knowledge</h4>
       <div class="kv" style="grid-template-columns:1fr;">${topicsHtml}</div>
     </section>
     <section>
-      <h4>How they approach the work</h4>
+      <h4>Work Approach</h4>
       <div class="kv" style="grid-template-columns:1fr;">${workHtml}</div>
     </section>
     <section>
-      <h4>Mentoring other consultants</h4>
+      <h4>Mentoring / Thought Partner</h4>
       <div class="tags">${c.sme.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
       ${c.smeOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.smeOtherText}</div>`:''}
     </section>
     <section>
-      <h4>Looking for from the network</h4>
+      <h4>Offer Support</h4>
       <div class="tags">${c.network.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
     </section>
     <section>
-      <h4>Availability</h4>
+      <h4>Request Support</h4>
       <div class="kv" style="grid-template-columns:1fr;">${availHtml}</div>
     </section>
     <section>
-      <h4>Services beyond B Corp</h4>
+      <h4>Other Services</h4>
       <div class="tags">${c.services.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
       ${c.servicesOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.servicesOtherText}</div>`:''}
     </section>
     <section>
-      <h4>Preferred collaboration structure</h4>
+      <h4>Collaboration Preference</h4>
       <div class="kv" style="grid-template-columns:1fr;">${collabHtml}</div>
     </section>
     ${c.note?`<section><h4>In their own words</h4><div class="notefield">${c.note}</div></section>`:''}
