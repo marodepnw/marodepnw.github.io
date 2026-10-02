@@ -186,6 +186,7 @@
   }
   table.gridpick.levels th{font-size:0.68rem;line-height:1.2;vertical-align:bottom;width:4.6rem;}
   table.gridpick.levels td.rowlabel{font-size:0.8rem;padding-right:0.5rem;}
+  table.gridpick.levels th.group{border-bottom:1px solid var(--ink-soft);}
   @media (max-width:480px){
     table.gridpick.levels th{font-size:0.6rem;width:3.4rem;padding:0.1rem;}
     table.gridpick.levels td.rowlabel{font-size:0.75rem;}
@@ -349,8 +350,6 @@ const LEVEL_ORDER = [
   "Comfortable verifying ALL of the standards",
   "Could lead a workshop on the standards"
 ];
-// Column headings for the Impact Topic matrix (same order as LEVEL_ORDER)
-const LEVEL_SHORT = ["Familiar with basic concepts","Verifies MOST standards","Verifies ALL standards","Could lead a workshop"];
 const MODE_MAP = {
   "I currently offer this":"offer",
   "I do this for all projects":"always",
@@ -526,9 +525,15 @@ function renderFilters(){
       <div class="body">
         <p class="help">Pick the minimum depth of knowledge you need for the specific topic. Consultants with a depth of knowledge exceeding the selection will automatically be included.
 
-This field reflects a consultants ability to interpret the standards, evaluate documentation relative to the standards, and ability to complete client deliverables.</p>
+This field reflects a consultants ability to interpret the standards, evaluate documentation relative to the standards, and ability to complete client deliverables. Click a selected circle again to clear it.</p>
         <table class="gridpick levels">
-          <tr><th></th>${LEVEL_SHORT.map(l=>`<th>${l}</th>`).join('')}</tr>
+          <tr>
+            <th rowspan="2"></th>
+            <th rowspan="2">Familiar with basic concepts</th>
+            <th class="group" colspan="2">Comfortable verifying:</th>
+            <th rowspan="2">Could lead a workshop</th>
+          </tr>
+          <tr><th>MOST standards</th><th>ALL standards</th></tr>
           ${topicRows}
         </table>
       </div>
