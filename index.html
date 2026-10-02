@@ -519,10 +519,10 @@ function renderFilters(){
       <summary>Company Size &amp; Standards - Experience &amp; Preference</summary>
       <div class="body">
         <ul class="help">
-          <li><strong>Experience</strong> – Indicates which company size a consultant has worked with under each version of the Standards.</li>
-          <li><strong>Preference</strong> – Indicates which company size a consultant prefers to engage with.</li>
+          <li><strong>Experience</strong> – Indicates which company sizes a consultant has worked with under each version of the Standards.</li>
+          <li><strong>Preference</strong> – Indicates which company sizes a consultant prefers to work with (Yes) and where they are likely to want support from another consultant (Maybe).</li>
         </ul>
-        <p class="help">Checking multiple boxes finds anyone with any one of them.</p>
+        <p class="help">Checking multiple boxes shows consultants who match at least one of them.</p>
         <table class="gridpick">
           <tr><th></th><th class="group" colspan="2">Experience</th><th class="group gstart" colspan="2">Preference</th></tr>
           <tr><th></th><th>v1</th><th>v2</th><th class="gstart">Yes</th><th>Maybe</th></tr>
@@ -568,7 +568,7 @@ This field reflects a consultants ability to interpret the standards, evaluate d
     <details class="fsection">
       <summary>Work Approach</summary>
       <div class="body">
-        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification. Checking multiple boxes finds anyone with any one of them.</p>
+        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification. Checking multiple boxes shows consultants who match at least one of them.</p>
         <div class="matrix-scroll">
         <table class="gridpick levels modes">
           <tr><th></th>${modeKeys.map(m=>`<th>${MODE_LABELS[m]}</th>`).join('')}</tr>
