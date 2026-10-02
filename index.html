@@ -154,6 +154,8 @@
     margin:0.25rem 0 0.6rem;
   }
   .fsection .body{padding-top:0.5rem;}
+  .fsection ul.help{padding-left:1.1rem;}
+  .fsection ul.help li{margin-bottom:0.2rem;}
 
   .chip-row{display:flex;flex-wrap:wrap;gap:0.4rem;}
   label.chk{
@@ -190,7 +192,11 @@
   @media (max-width:480px){
     table.gridpick.levels th{font-size:0.6rem;width:3.4rem;padding:0.1rem;}
     table.gridpick.levels td.rowlabel{font-size:0.75rem;}
+    table.gridpick.modes th{font-size:0.55rem;width:auto;}
+    table.gridpick.modes td.rowlabel{font-size:0.66rem;padding-right:0.2rem;}
+    table.gridpick.modes td, table.gridpick.modes th{padding-left:0.1rem;padding-right:0.1rem;}
   }
+  .matrix-scroll{overflow-x:auto;}
   table.gridpick.levels tr + tr td{border-top:1px solid var(--line);}
   .topicrow{margin-bottom:0.5rem;}
   .topicrow .tname{font-size:0.85rem;font-weight:500;display:block;margin-bottom:0.2rem;}
@@ -373,6 +379,13 @@ function findCols(headers, keyword){
   return out;
 }
 
+// Clean up typed-in survey answers: trim, capitalize the first letter, fix "b team"
+function tidyLabel(s){
+  s = s.trim();
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s.replace(/\bb team\b/g, 'B team');
+}
+
 function collectOtherWriteIns(cols){
   // "Other - Write In" columns come as N checkbox columns followed by N matching text columns
   const others = cols.filter(c => c.parts[0].trim() === 'Other - Write In');
@@ -402,6 +415,7 @@ function buildData(headers, rows){
   const servicesCols = servicesColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
   const servicesOther = collectOtherWriteIns(servicesColsAll);
 
+  workCols.forEach(c=>{ c.parts[1] = tidyLabel(c.parts[1]); });
   const workTypes = [...new Set(workCols.map(c=>c.parts[1]))];
   const topicNames = topicCols.map(c=>c.parts[0]);
   const smeOptions = [...new Set(smeCols.map(c=>c.parts[0]))];
@@ -473,7 +487,7 @@ const state = {
   search:'',
   sizes:new Set(),        // "Large|v2" or "Large|preferred" style keys
   topicMin:{},            // topicName -> level string
-  work:{},                // workType -> mode string
+  work:new Set(),         // "workType|mode" keys
   sme:new Set(),
   network:new Set(),
   avail:new Set(),        // "supportType|timeframe" keys
@@ -504,7 +518,11 @@ function renderFilters(){
     <details class="fsection" open>
       <summary>Company Size &amp; Standards - Experience &amp; Preference</summary>
       <div class="body">
-        <p class="help">Checking multiple boxes finds anyone with any one of them.</p>
+        <ul class="help">
+          <li><strong>Experience</strong> – Indicates which company sizes a consultant has worked with under each version of the Standards.</li>
+          <li><strong>Preference</strong> – Indicates which company sizes a consultant prefers to work with (Yes) and where they are likely to want support from another consultant (Maybe).</li>
+        </ul>
+        <p class="help">Checking multiple boxes shows consultants who match at least one of them.</p>
         <table class="gridpick">
           <tr><th></th><th class="group" colspan="2">Experience</th><th class="group gstart" colspan="2">Preference</th></tr>
           <tr><th></th><th>v1</th><th>v2</th><th class="gstart">Yes</th><th>Maybe</th></tr>
@@ -542,19 +560,21 @@ This field reflects a consultants ability to interpret the standards, evaluate d
   // -- Work approach --
   const modeKeys = Object.keys(MODE_LABELS);
   const workRows = DATA.options.workTypes.map(t=>`
-    <div class="topicrow">
-      <span class="tname">${t}</span>
-      <select class="levelpick" data-group="workMode" data-key="${t}">
-        <option value="">Any approach / not needed</option>
-        ${modeKeys.map(m=>`<option value="${m}">${MODE_LABELS[m]}</option>`).join('')}
-      </select>
-    </div>`).join('');
+    <tr>
+      <td class="rowlabel">${t}</td>
+      ${modeKeys.map(m=>`<td><input type="checkbox" data-group="work" data-key="${t}|${m}" title="${MODE_LABELS[m]}"></td>`).join('')}
+    </tr>`).join('');
   wrap.appendChild(el(`
     <details class="fsection">
       <summary>Work Approach</summary>
       <div class="body">
-        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification.</p>
-        ${workRows}
+        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification. Checking multiple boxes shows consultants who match at least one of them.</p>
+        <div class="matrix-scroll">
+        <table class="gridpick levels modes">
+          <tr><th></th>${modeKeys.map(m=>`<th>${MODE_LABELS[m]}</th>`).join('')}</tr>
+          ${workRows}
+        </table>
+        </div>
       </div>
     </details>`));
 
@@ -639,14 +659,6 @@ This field reflects a consultants ability to interpret the standards, evaluate d
       renderResults();
     });
   });
-  wrap.querySelectorAll('select[data-group="workMode"]').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const key = sel.dataset.key;
-      if(sel.value) state.work[key] = sel.value;
-      else delete state.work[key];
-      renderResults();
-    });
-  });
 }
 
 function onCheckboxChange(e){
@@ -695,13 +707,12 @@ function scoreConsultant(c){
     if(!any) sectionsFailed++;
   }
 
-  const workKeys = Object.keys(state.work);
-  if(workKeys.length){
+  if(state.work.size){
     sectionsActive++;
     let any=false;
-    workKeys.forEach(type=>{
+    state.work.forEach(key=>{
       total++;
-      const mode = state.work[type];
+      const [type,mode] = key.split('|');
       if(c.workApproach[type] && c.workApproach[type][mode]){ satisfied++; any=true; }
     });
     if(!any) sectionsFailed++;
@@ -786,7 +797,7 @@ function sizesWorkedTags(c){
 }
 
 function renderResults(){
-  const anyActive = state.sizes.size||Object.keys(state.topicMin).length||Object.keys(state.work).length||state.sme.size||state.network.size||state.avail.size||state.services.size||state.collab.size;
+  const anyActive = state.sizes.size||Object.keys(state.topicMin).length||state.work.size||state.sme.size||state.network.size||state.avail.size||state.services.size||state.collab.size;
 
   let list = DATA.consultants.filter(matchesSearch).map(c=>{
     const s = scoreConsultant(c);
@@ -930,7 +941,7 @@ document.getElementById('sortPick').addEventListener('change', e=>{
   renderResults();
 });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.sizes.clear(); state.topicMin={}; state.work={};
+  state.search=''; state.sizes.clear(); state.topicMin={}; state.work.clear();
   state.sme.clear(); state.network.clear(); state.avail.clear();
   state.services.clear(); state.collab.clear();
   document.getElementById('searchBox').value='';
