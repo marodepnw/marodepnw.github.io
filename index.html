@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consultant Collaboration Directory - B Corp</title>
+<title>B Corp Consultant Collaboration Directory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,294 +20,152 @@
     --gold:#C98A2B;
     --gold-soft:#F3E3C5;
     --rust:#B5573A;
-    --rust-soft:#F5DED6;
-    --grey-soft:#E7E7E1;
+    --empty:#EEF1EA;
     --radius:10px;
     --shadow: 0 2px 10px rgba(30,42,34,0.07);
+    /* depth-of-knowledge scale */
+    --lv0:#DCE7DF; --lv1:#A9C7B4; --lv2:#4B7A64; --lv3:#22382F;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Public Sans', -apple-system, sans-serif;
-    line-height:1.5;
-  }
-  h1,h2,h3,h4{
-    font-family:'Fraunces', Georgia, serif;
-    font-weight:600;
-    color:var(--forest-dark);
-    margin:0 0 .3em 0;
-  }
+  body{background:var(--paper);color:var(--ink);font-family:'Public Sans',-apple-system,sans-serif;line-height:1.5;}
+  h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:600;color:var(--forest-dark);margin:0 0 .3em 0;}
   a{color:var(--forest-dark);}
 
-  /* ---------- Header ---------- */
-  header.site{
-    background:var(--forest-dark);
-    color:#EFEFE6;
-    padding:2rem 1.5rem 1.6rem;
-  }
-  header.site .wrap{max-width:1200px;margin:0 auto;}
-  header.site h1{
-    color:#fff;
-    font-size:clamp(1.6rem,3vw,2.3rem);
-    letter-spacing:-0.01em;
-  }
-  header.site p{
-    max-width:68.2ch;
-    color:#CBD6C7;
-    margin:0.4rem 0 0;
-    font-size:0.98rem;
-  }
-  /* max-width matches the line above despite the smaller font (68.2ch x 0.98rem / (0.98rem - 2pt)) */
-  header.site p.credit{font-size:calc(0.98rem - 2pt);max-width:82.2ch;}
-  header.site .stat-line{
-    margin-top:1rem;
-    font-size:0.85rem;
-    color:#A9C0A2;
-  }
+  header.site{background:var(--forest-dark);color:#EFEFE6;padding:2rem 1.5rem 1.6rem;}
+  header.site .wrap{max-width:1400px;margin:0 auto;}
+  header.site h1{color:#fff;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-0.01em;}
+  header.site p{max-width:62ch;color:#CBD6C7;margin:.4rem 0 0;font-size:.98rem;}
+  header.site .stat-line{margin-top:1rem;font-size:.85rem;color:#A9C0A2;}
 
-  /* ---------- Layout ---------- */
+  /* ---------- Layout: filters are the wider column ---------- */
   .layout{
-    max-width:1200px;
-    margin:0 auto;
-    padding:1.5rem;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:1.5rem;
-    align-items:start;
+    max-width:1400px;margin:0 auto;padding:1.5rem;
+    display:grid;grid-template-columns:minmax(460px,5fr) minmax(0,4fr);gap:1.5rem;align-items:start;
   }
-  @media (max-width: 880px){
-    .layout{grid-template-columns:1fr;}
-  }
+  @media (max-width:1000px){ .layout{grid-template-columns:1fr;} }
 
-  /* ---------- Filters panel ---------- */
-  #filterToggle{
-    display:none;
-  }
   .filters{
-    background:var(--paper-raised);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:1.1rem;
-    position:sticky;
-    top:1rem;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.2rem 1.3rem;position:sticky;top:1rem;max-height:calc(100vh - 2rem);overflow-y:auto;
   }
-  .filters h2{font-size:1.05rem;margin-bottom:0.9rem;}
-  .filter-actions{
-    display:flex; gap:.5rem; margin-bottom:1rem;
-  }
-  .btn{
-    font-family:inherit;
-    font-size:0.85rem;
-    font-weight:600;
-    border:1px solid var(--forest-dark);
-    background:var(--forest-dark);
-    color:#fff;
-    padding:0.5rem 0.9rem;
-    border-radius:7px;
-    cursor:pointer;
-  }
-  .btn.secondary{
-    background:transparent;
-    color:var(--forest-dark);
-  }
-  .btn:hover{opacity:0.88;}
+  @media (max-width:1000px){ .filters{position:static;max-height:none;} }
+  .filters h2{font-size:1.1rem;margin-bottom:.9rem;}
+  .filter-actions{display:flex;gap:.5rem;margin-bottom:1rem;}
+  .btn{font-family:inherit;font-size:.85rem;font-weight:600;border:1px solid var(--forest-dark);background:var(--forest-dark);color:#fff;padding:.5rem .9rem;border-radius:7px;cursor:pointer;}
+  .btn:hover{opacity:.88;}
+  input[type="text"].search{width:100%;padding:.55rem .7rem;border:1px solid var(--line);border-radius:7px;font-family:inherit;font-size:.9rem;margin-bottom:1rem;}
 
-  input[type="text"].search{
-    width:100%;
-    padding:0.55rem 0.7rem;
-    border:1px solid var(--line);
-    border-radius:7px;
-    font-family:inherit;
-    font-size:0.9rem;
-    margin-bottom:1rem;
-  }
-
-  details.fsection{
-    border-top:1px solid var(--line);
-    padding:0.7rem 0;
-  }
+  details.fsection{border-top:1px solid var(--line);padding:.75rem 0;}
   details.fsection:first-of-type{border-top:none;}
-  details.fsection summary{
-    cursor:pointer;
-    font-weight:600;
-    font-size:0.92rem;
-    color:var(--forest-dark);
-    list-style:none;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
+  details.fsection summary{cursor:pointer;font-weight:600;font-size:.95rem;color:var(--forest-dark);list-style:none;display:flex;align-items:center;}
   details.fsection summary::-webkit-details-marker{display:none;}
-  details.fsection summary::after{
-    content:"+";
-    font-size:1.1rem;
-    color:var(--ink-soft);
-  }
+  details.fsection summary::after{content:"+";font-size:1.1rem;color:var(--ink-soft);}
   details.fsection[open] summary::after{content:"–";}
-  .fsection .help{
-    font-size:0.78rem;
-    color:var(--ink-soft);
-    margin:0.25rem 0 0.6rem;
-  }
-  .fsection .body{padding-top:0.5rem;}
-  .fsection ul.help{padding-left:1.1rem;}
-  .fsection ul.help li{margin-bottom:0.2rem;}
+  details.fsection summary .cnt{margin:0 auto 0 .5rem;font-size:.75rem;font-weight:700;color:#fff;background:var(--gold);border-radius:999px;padding:0 .5rem;}
+  details.fsection summary .cnt:empty{display:none;}
+  details.fsection summary .title{margin-right:auto;}
+  details.fsection summary .cnt:not(:empty){margin-left:0;margin-right:auto;}
+  .fsection .help{font-size:.8rem;color:var(--ink-soft);margin:.3rem 0 .6rem;}
+  .fsection .body{padding-top:.4rem;}
 
-  .chip-row{display:flex;flex-wrap:wrap;gap:0.4rem;}
-  label.chk{
-    display:flex;align-items:center;gap:0.4rem;
-    font-size:0.85rem;
-    padding:0.3rem 0;
-    cursor:pointer;
-  }
+  .chip-row{display:flex;flex-wrap:wrap;gap:.2rem 1.2rem;}
+  label.chk{display:flex;align-items:center;gap:.4rem;font-size:.86rem;padding:.3rem 0;cursor:pointer;}
   label.chk input{accent-color:var(--forest-dark);}
 
-  table.gridpick{width:100%;border-collapse:collapse;font-size:0.82rem;}
-  table.gridpick th{
-    font-weight:600;color:var(--ink-soft);text-align:center;padding:0.2rem;font-size:0.72rem;
-  }
-  table.gridpick td{padding:0.25rem 0.2rem;}
-  table.gridpick td.rowlabel{text-align:left;font-weight:500;}
-  table.gridpick td{text-align:center;}
-  table.gridpick input{accent-color:var(--forest-dark);}
-  table.gridpick th.group{color:var(--forest-dark);font-size:0.75rem;border-bottom:1px solid var(--line);}
-  table.gridpick .gstart{border-left:1px solid var(--line);}
-
-  select.levelpick{
-    width:100%;
-    font-family:inherit;
-    font-size:0.82rem;
-    padding:0.35rem;
-    border:1px solid var(--line);
-    border-radius:6px;
-    margin-bottom:0.3rem;
-  }
-  table.gridpick.levels th{font-size:0.68rem;line-height:1.2;vertical-align:bottom;width:4.6rem;}
-  table.gridpick.levels td.rowlabel{font-size:0.8rem;padding-right:0.5rem;}
-  table.gridpick.levels th.group{border-bottom:1px solid var(--ink-soft);}
-  @media (max-width:480px){
-    table.gridpick.levels th{font-size:0.6rem;width:3.4rem;padding:0.1rem;}
-    table.gridpick.levels td.rowlabel{font-size:0.75rem;}
-    table.gridpick.modes th{font-size:0.55rem;width:auto;}
-    table.gridpick.modes td.rowlabel{font-size:0.66rem;padding-right:0.2rem;}
-    table.gridpick.modes td, table.gridpick.modes th{padding-left:0.1rem;padding-right:0.1rem;}
-  }
-  .matrix-scroll{overflow-x:auto;}
-  table.gridpick.levels tr + tr td{border-top:1px solid var(--line);}
-  .topicrow{margin-bottom:0.5rem;}
-  .topicrow .tname{font-size:0.85rem;font-weight:500;display:block;margin-bottom:0.2rem;}
+  /* ---------- Filter matrices ---------- */
+  table.gridpick{width:100%;border-collapse:collapse;font-size:.84rem;table-layout:fixed;}
+  table.gridpick th{font-weight:600;color:var(--ink-soft);text-align:center;padding:.3rem .2rem;font-size:.72rem;line-height:1.15;vertical-align:bottom;}
+  table.gridpick th:first-child{width:36%;}
+  table.gridpick td{padding:.28rem .2rem;text-align:center;border-top:1px solid #EEF1EA;}
+  table.gridpick td.rowlabel{text-align:left;font-weight:500;padding-right:.5rem;line-height:1.25;}
+  table.gridpick tr:hover td{background:#F5F8F2;}
+  table.gridpick input{accent-color:var(--forest-dark);width:16px;height:16px;cursor:pointer;margin:0;}
 
   /* ---------- Results ---------- */
-  .resultsHead{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:1rem; flex-wrap:wrap; gap:0.6rem;
-  }
-  .resultsHead .count{font-size:0.95rem;color:var(--ink-soft);}
-  .resultsHead select{
-    font-family:inherit;font-size:0.85rem;padding:0.4rem 0.6rem;
-    border:1px solid var(--line);border-radius:7px;background:#fff;
-  }
+  .resultsHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.6rem;}
+  .resultsHead .count{font-size:.95rem;color:var(--ink-soft);}
+  .resultsHead select{font-family:inherit;font-size:.85rem;padding:.4rem .6rem;border:1px solid var(--line);border-radius:7px;background:#fff;}
 
-  .cards{display:flex;flex-direction:column;gap:0.9rem;}
-  .card{
-    background:var(--paper-raised);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:1.1rem 1.2rem;
-    box-shadow:var(--shadow);
-  }
-  .card-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;}
-  .card h3{font-size:1.15rem;margin-bottom:0.1rem;}
-  .card .company{color:var(--ink-soft);font-size:0.92rem;margin-bottom:0.3rem;}
-  .card .loc{color:var(--ink-soft);font-size:0.82rem;}
+  .legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.75rem;color:var(--ink-soft);margin-bottom:1rem;align-items:center;}
+  .legend b{color:var(--forest-dark);}
+  .legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:.3rem;}
 
-  .badge{
-    font-size:0.75rem;font-weight:700;
-    padding:0.3rem 0.7rem;border-radius:999px;
-    white-space:nowrap;
-  }
+  .cards{display:flex;flex-direction:column;gap:1rem;}
+  .card{background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.2rem;box-shadow:var(--shadow);}
+  .card-top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:.4rem;}
+  .card h3{font-size:1.15rem;margin-bottom:.1rem;}
+  .card .company{color:var(--ink-soft);font-size:.92rem;}
+
+  .badge{font-size:.75rem;font-weight:700;padding:.3rem .7rem;border-radius:999px;white-space:nowrap;}
   .badge.full{background:var(--gold);color:#fff;}
   .badge.strong{background:var(--gold-soft);color:#8A5A16;border:1px solid var(--gold);}
-  .badge.partial{background:var(--grey-soft);color:var(--ink-soft);border:1px solid var(--line);}
+  .badge.partial{background:#E7E7E1;color:var(--ink-soft);border:1px solid var(--line);}
 
-  .tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.7rem;}
-  .tag{
-    background:var(--forest);
-    color:#fff;
-    font-size:0.75rem;
-    padding:0.22rem 0.6rem;
-    border-radius:6px;
-  }
-  .tag.alt{background:#EDF1E9;color:var(--forest-dark);border:1px solid var(--line);}
+  .blk{margin-top:.9rem;}
+  .blk-h{font-size:.8rem;font-weight:700;color:var(--forest-dark);margin-bottom:.35rem;}
 
-  .card-actions{margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;}
-  .card-actions a, .card-actions button{
-    font-size:0.82rem;font-weight:600;
-    text-decoration:none;
-    border:1px solid var(--forest-dark);
-    color:var(--forest-dark);
-    background:#fff;
-    padding:0.4rem 0.8rem;
-    border-radius:7px;
-    cursor:pointer;
-    font-family:inherit;
-  }
-  .card-actions a.primary{background:var(--forest-dark);color:#fff;}
+  /* company-size grid */
+  .sgrid{display:grid;grid-template-columns:minmax(96px,1.5fr) repeat(7,minmax(0,1fr));gap:3px;align-items:center;}
+  .sgrid .sh{text-align:center;font-size:.64rem;line-height:1.1;color:var(--ink-soft);padding-bottom:2px;}
+  .sgrid .sl{font-size:.72rem;color:var(--ink);padding-right:.3rem;line-height:1.15;}
+  .sc{height:22px;border-radius:4px;background:var(--empty);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;}
+  .sc.on.v1{background:#86AD9C;}
+  .sc.on.v2{background:#2F5B50;}
+  .sc.on.pref{background:var(--gold);}
+  .sc.on.supp{background:var(--rust);}
+  .sc.hit, .tile.hit, .mc.hit{outline:2px solid var(--ink);outline-offset:1px;}
 
-  .empty{
-    text-align:center;padding:3rem 1rem;color:var(--ink-soft);
-  }
+  /* impact-topic tiles */
+  .tgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+  .tile{border-radius:6px;padding:.4rem .1rem .35rem;text-align:center;background:var(--empty);color:var(--ink-soft);border:1px dashed var(--line);}
+  .tile .ab{display:block;font-weight:700;font-size:.8rem;}
+  .tile .lv{display:block;font-size:.62rem;line-height:1.1;margin-top:1px;}
+  .tile.l0{background:var(--lv0);color:var(--ink);border:1px solid var(--lv0);}
+  .tile.l1{background:var(--lv1);color:var(--ink);border:1px solid var(--lv1);}
+  .tile.l2{background:var(--lv2);color:#fff;border:1px solid var(--lv2);}
+  .tile.l3{background:var(--lv3);color:#fff;border:1px solid var(--lv3);}
+
+  /* support blocks */
+  .support{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.9rem;margin-top:.9rem;}
+  .support .blk{margin-top:0;}
+  .gline{font-size:.78rem;margin-bottom:.35rem;line-height:1.3;}
+  .gtf{display:inline-block;font-weight:700;color:var(--forest-dark);margin-right:.4rem;}
+  .chips{display:flex;flex-wrap:wrap;gap:.3rem;}
+  .chip{background:#EDF1E9;border:1px solid var(--line);font-size:.74rem;padding:.15rem .5rem;border-radius:6px;color:var(--forest-dark);}
+  .muted{font-size:.78rem;color:var(--ink-soft);}
+
+  .card-actions{margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;}
+  .card-actions a,.card-actions button{font-size:.82rem;font-weight:600;text-decoration:none;border:1px solid var(--forest-dark);color:var(--forest-dark);background:#fff;padding:.4rem .8rem;border-radius:7px;cursor:pointer;font-family:inherit;}
+  .card-actions button.primary{background:var(--forest-dark);color:#fff;}
+  .empty{text-align:center;padding:3rem 1rem;color:var(--ink-soft);}
 
   /* ---------- Modal ---------- */
-  .modal-backdrop{
-    position:fixed;inset:0;background:rgba(20,28,22,0.55);
-    display:none;align-items:flex-start;justify-content:center;
-    padding:3vh 1rem;overflow-y:auto;z-index:50;
-  }
+  .modal-backdrop{position:fixed;inset:0;background:rgba(20,28,22,.55);display:none;align-items:flex-start;justify-content:center;padding:3vh 1rem;overflow-y:auto;z-index:50;}
   .modal-backdrop.open{display:flex;}
-  .modal{
-    background:#fff;border-radius:12px;max-width:680px;width:100%;
-    padding:1.6rem;position:relative;
-  }
-  .modal h2{margin-bottom:0.1rem;}
-  .modal .close{
-    position:absolute;top:1rem;right:1rem;
-    border:none;background:none;font-size:1.4rem;cursor:pointer;color:var(--ink-soft);
-  }
-  .modal section{margin-top:1.1rem;}
-  .modal section h4{font-size:0.85rem;text-transform:none;color:var(--forest-dark);margin-bottom:0.4rem;}
-  .kv{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem;font-size:0.85rem;}
-  .kv div span{color:var(--ink-soft);}
-  .modal .notefield{
-    background:var(--paper);border-radius:8px;padding:0.7rem;font-size:0.85rem;white-space:pre-wrap;
-  }
+  .modal{background:#fff;border-radius:12px;max-width:780px;width:100%;padding:1.6rem;position:relative;}
+  .modal h2{margin-bottom:.1rem;}
+  .modal .close{position:absolute;top:1rem;right:1rem;border:none;background:none;font-size:1.5rem;cursor:pointer;color:var(--ink-soft);}
+  .modal section{margin-top:1.3rem;}
+  .modal section h4{font-size:.95rem;margin-bottom:.45rem;}
+  .modal .notefield{background:var(--paper);border-radius:8px;padding:.7rem;font-size:.85rem;white-space:pre-wrap;}
+  .mgrid{display:grid;grid-template-columns:minmax(150px,2.6fr) repeat(5,minmax(0,1fr));gap:3px;align-items:center;}
+  .mgrid .mh{font-size:.64rem;text-align:center;color:var(--ink-soft);line-height:1.1;padding-bottom:2px;}
+  .mgrid .ml{font-size:.76rem;line-height:1.2;padding-right:.4rem;}
+  .mc{height:22px;border-radius:4px;background:var(--empty);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.72rem;}
+  .mc.on{background:var(--forest);}
 
-  footer{
-    max-width:1200px;margin:0 auto;padding:2rem 1.5rem 3rem;
-    color:var(--ink-soft);font-size:0.8rem;
-  }
-  footer a{color:var(--forest-dark);}
-
-  .loading, .error{max-width:1200px;margin:2rem auto;padding:0 1.5rem;color:var(--ink-soft);}
-
-  @media (max-width:880px){
-    .filters{position:static;max-height:none;}
-  }
+  footer{max-width:1400px;margin:0 auto;padding:2rem 1.5rem 3rem;color:var(--ink-soft);font-size:.8rem;}
+  .loading,.error{max-width:1400px;margin:2rem auto;padding:0 1.5rem;color:var(--ink-soft);}
 </style>
 </head>
 <body>
 
 <header class="site">
   <div class="wrap">
-    <h1>Consultant Collaboration Directory - B Corp</h1>
-    <p>This directory is intended to help US & Canada consultants engaged with B Corp certification identify collaboration partners. Participation in the directory is voluntary. If you want to be included in the directory, please contact info@measurepnw.com.<p>
-    <p></p>
-    <p class="credit">The concept for this directory was created by Measure Meant in collaboration with members of the B Corp US & Canada consultants group. The website was created by Carl Odegard for Measure Meant.<p>
-    <div class="stat-line" id="statLine">Loading consultant profiles…</div>
+    <h1>B Corp Consultant Collaboration Directory</h1>
+    <p>Find other B Corp consultants by the size of company they work with, the standards they know well, how they like to work, and when they're free — instead of relying on who happens to be in your contacts.</p>
+    <div class="stat-line" id="statLine"></div>
   </div>
 </header>
 
@@ -317,7 +175,6 @@
 <div class="layout" id="appLayout" style="display:none;">
   <aside class="filters" id="filters">
     <h2>Find a collaborator</h2>
-    <p> Use the filter criteria below to find a partner that aligns with your specific project and support needs. Selecting multiple criteria will narrow the search results.</p>
     <div class="filter-actions">
       <button class="btn" id="clearBtn">Clear all filters</button>
     </div>
@@ -333,12 +190,20 @@
         <option value="name">Sort: name (A–Z)</option>
       </select>
     </div>
+    <div class="legend">
+      <b>Impact topic depth:</b>
+      <span><i class="sw" style="background:var(--lv0)"></i>Basic concepts</span>
+      <span><i class="sw" style="background:var(--lv1)"></i>Verifies most</span>
+      <span><i class="sw" style="background:var(--lv2)"></i>Verifies all</span>
+      <span><i class="sw" style="background:var(--lv3)"></i>Can lead a workshop</span>
+      <span><i class="sw" style="background:var(--empty);border:1px dashed var(--line)"></i>Not answered</span>
+    </div>
     <div class="cards" id="cards"></div>
   </main>
 </div>
 
 <footer>
-  
+  Data comes from <code>data.csv</code> in this same folder, read directly by your browser. Replace that file with a fresh survey export to update the directory. Nothing is uploaded anywhere.
 </footer>
 
 <div class="modal-backdrop" id="modalBackdrop">
@@ -347,15 +212,26 @@
 
 <script>
 /* ============================================================
-   1. CONSTANTS describing the shape of the survey
+   1. CONSTANTS describing the survey
    ============================================================ */
 const SIZE_ORDER = ["Company without workers","Micro","Small","Medium","Large","X Large","XX Large"];
+const SIZE_SHORT = {"Company without workers":"No workers","Micro":"Micro","Small":"Small","Medium":"Medium","Large":"Large","X Large":"X Large","XX Large":"XX Large"};
+// One matrix merges the experience question and the preference question
+const SIZE_COLS = [
+  {key:'v1',     cls:'v1',   head:'v1 experience',          row:'Experience, v1 standards'},
+  {key:'v2',     cls:'v2',   head:'v2 experience',          row:'Experience, v2 standards'},
+  {key:'pref',   cls:'pref', head:'Prefers this size',      row:'Prefers to work with'},
+  {key:'support',cls:'supp', head:'Likely to want support', row:'Likely to want support'}
+];
 const LEVEL_ORDER = [
   "Familiar with the basic concepts",
   "Comfortable verifying MOST of the standards",
   "Comfortable verifying ALL of the standards",
   "Could lead a workshop on the standards"
 ];
+const LEVEL_SHORT = ["Basic","Most","All","Workshop"];
+const LEVEL_HEAD  = ["Basic concepts","Verifies most","Verifies all","Can lead a workshop"];
+
 const MODE_MAP = {
   "I currently offer this":"offer",
   "I do this for all projects":"always",
@@ -363,609 +239,464 @@ const MODE_MAP = {
   "I generally seek a partner on this":"seekPartner",
   "I am willing to subcontract this":"subcontract"
 };
-const MODE_LABELS = {
-  offer:"Offers this", always:"Does this on every project", prefer:"Prefers this work",
-  seekPartner:"Usually wants a partner for this", subcontract:"Open to subcontracting this out"
-};
+const MODE_KEYS = ["offer","always","prefer","seekPartner","subcontract"];
+const MODE_HEAD = {offer:"Offers",always:"Every project",prefer:"Prefers",seekPartner:"Wants a partner",subcontract:"Will subcontract"};
+
+const AVAIL_NOW = "Available now";
+const NOT_INTERESTED = "Not interested in providing this type of support";
+
+const MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+
+function parseSubmitted(s){
+  const m = /([A-Za-z]{3})[a-z]*\.? (\d{1,2}), (\d{4}) (\d{1,2}):(\d{2})(?::(\d{2}))? ?([ap]m)/i.exec(s||'');
+  if(!m) return null;
+  let h = (+m[4])%12; if(m[7].toLowerCase()==='pm') h+=12;
+  return new Date(+m[3], MONTHS[m[1].toLowerCase()], +m[2], h, +m[5], +(m[6]||0));
+}
+function fmtDate(d, withYear){
+  return d.toLocaleDateString('en-US', withYear ? {year:'numeric',month:'long',day:'numeric'} : {month:'short',day:'numeric'});
+}
+
+// Quarter helpers ("Q1 2027")
+function quarterInfo(tf){
+  const m = /^Q([1-4])\s+(\d{4})$/.exec((tf||'').trim());
+  return m ? {q:+m[1], y:+m[2]} : null;
+}
+function tfCompare(a,b){
+  const qa=quarterInfo(a), qb=quarterInfo(b);
+  if(qa && qb) return (qa.y*10+qa.q)-(qb.y*10+qb.q);
+  if(qa) return -1;
+  if(qb) return 1;
+  return a.localeCompare(b);
+}
+function quarterIsPast(tf){
+  const q = quarterInfo(tf);
+  if(!q) return false;
+  const end = new Date(q.y, q.q*3, 0, 23, 59, 59); // last day of the quarter
+  return end < new Date();
+}
 
 /* ============================================================
    2. LOAD + PARSE
    ============================================================ */
 function findCols(headers, keyword){
   const out = [];
-  headers.forEach((h,i)=>{
-    if (h && h.includes(keyword)) out.push({index:i, parts:h.split(':')});
-  });
+  headers.forEach((h,i)=>{ if(h && h.includes(keyword)) out.push({index:i, parts:h.split(':')}); });
   return out;
 }
-
-// Clean up typed-in survey answers: trim, capitalize the first letter, fix "b team"
-function tidyLabel(s){
-  s = s.trim();
-  s = s.charAt(0).toUpperCase() + s.slice(1);
-  return s.replace(/\bb team\b/g, 'B team');
-}
-
 function collectOtherWriteIns(cols){
   // "Other - Write In" columns come as N checkbox columns followed by N matching text columns
-  const others = cols.filter(c => c.parts[0].trim() === 'Other - Write In');
-  const half = others.length/2;
-  const pairs = [];
-  for(let i=0;i<half;i++){
-    pairs.push({checkIdx: others[i].index, textIdx: others[half+i].index});
-  }
+  const others = cols.filter(c => c.parts[0].trim()==='Other - Write In');
+  const half = others.length/2, pairs=[];
+  for(let i=0;i<half;i++) pairs.push({checkIdx:others[i].index, textIdx:others[half+i].index});
   return pairs;
 }
 
 function buildData(headers, rows){
-  const sizeCols = findCols(headers, "What size companies are you working with or have worked with").filter(c=>c.parts[1]!=='None');
-  const sizePrefCols = findCols(headers, "What size companies do you prefer to work with and which size are you most likely to want support").filter(c=>c.parts[1]!=='None');
-  const topicCols = findCols(headers, "What is your level of experience/expertise with the concepts for each Impact Topic");
-  const workCols = findCols(headers, "For each type of work in the rows below, please indicate how you approach work on B Corp certifications");
-  const smeColsAll = findCols(headers, "Are you interested in providing subject matter expertise and guidance/direction to other consultants");
-  const networkColsAll = findCols(headers, "would you most like to receive from this consultant network");
-  const availCols = findCols(headers, "What support would you most like to provide to other consultants");
-  const servicesColsAll = findCols(headers, "What services do you provide beyond B Corp consulting");
-  const collabCols = findCols(headers, "how do you prefer to structure the relationship");
-  const noteCol = findCols(headers, "Please share any additional information")[0];
+  const sizeCols = findCols(headers,"What size companies are you working with or have worked with").filter(c=>c.parts[1]!=='None');
+  const sizePrefCols = findCols(headers,"What size companies do you prefer to work with and which size are you most likely to want support").filter(c=>c.parts[1]!=='None');
+  const topicCols = findCols(headers,"What is your level of experience/expertise with the concepts for each Impact Topic");
+  const workCols = findCols(headers,"For each type of work in the rows below, please indicate how you approach work on B Corp certifications");
+  const smeAll = findCols(headers,"Are you interested in providing subject matter expertise and guidance/direction to other consultants");
+  const networkAll = findCols(headers,"would you most like to receive from this consultant network");
+  const availCols = findCols(headers,"availability to provide the following support for other consultants");
+  const servicesAll = findCols(headers,"What services do you provide beyond B Corp consulting");
+  const collabCols = findCols(headers,"how do you prefer to structure the relationship");
+  const noteCol = findCols(headers,"Please share any additional information")[0];
 
-  const smeCols = smeColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
-  const smeOther = collectOtherWriteIns(smeColsAll);
-  const networkCols = networkColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
-  const servicesCols = servicesColsAll.filter(c=>c.parts[0].trim()!=='Other - Write In');
-  const servicesOther = collectOtherWriteIns(servicesColsAll);
+  const notOther = c=>c.parts[0].trim()!=='Other - Write In';
+  const smeCols = smeAll.filter(notOther), smeOther = collectOtherWriteIns(smeAll);
+  const networkCols = networkAll.filter(notOther);
+  const servicesCols = servicesAll.filter(notOther), servicesOther = collectOtherWriteIns(servicesAll);
 
-  workCols.forEach(c=>{ c.parts[1] = tidyLabel(c.parts[1]); });
   const workTypes = [...new Set(workCols.map(c=>c.parts[1]))];
   const topicNames = topicCols.map(c=>c.parts[0]);
   const smeOptions = [...new Set(smeCols.map(c=>c.parts[0]))];
   const networkOptions = [...new Set(networkCols.map(c=>c.parts[0]))];
   const availTypes = [...new Set(availCols.map(c=>c.parts[0]))];
-  // Filter options: hide "Not interested"; list "Available now", then quarters in date order, then "Depends on the scope"
-  const AVAIL_HIDDEN = ['Not interested in providing this type of support'];
-  const quarterKey = tf => { const m = tf.match(/^Q([1-4]) (\d{4})$/); return tf==='Available now' ? -Infinity : m ? m[2]*10 + (+m[1]) : Infinity; };
-  const availTimeframes = [...new Set(rows.flatMap(r=>availCols.map(c=>r[c.index])).filter(Boolean))]
-    .filter(tf => !AVAIL_HIDDEN.includes(tf))
-    .sort((a,b) => (a==='Depends on the scope') - (b==='Depends on the scope') || quarterKey(a) - quarterKey(b));
   const serviceOptions = [...new Set(servicesCols.map(c=>c.parts[0]))];
   const collabTypes = [...new Set(collabCols.map(c=>c.parts[0]))];
 
+  // Timeframes offered as filter columns: drop "Available now", "Not interested", and past quarters
+  const availTimeframes = [...new Set(rows.flatMap(r=>availCols.map(c=>r[c.index])).filter(Boolean))]
+    .filter(tf=>tf!==AVAIL_NOW && tf!==NOT_INTERESTED && !quarterIsPast(tf))
+    .sort(tfCompare);
+
   const idx = {
-    name: headers.indexOf('Your Name'),
-    company: headers.indexOf('Company Name'),
-    email: headers.indexOf('Your Email'),
-    city: headers.indexOf('City'),
-    state: headers.indexOf('State/Region'),
-    country: headers.indexOf('Country')
+    name:headers.indexOf('Your Name'), company:headers.indexOf('Company Name'),
+    email:headers.indexOf('Your Email'), submitted:headers.indexOf('Date Submitted')
   };
+
+  let lastUpdated = null;
+  rows.forEach(r=>{
+    const d = parseSubmitted(r[idx.submitted]);
+    if(d && (!lastUpdated || d>lastUpdated)) lastUpdated = d;
+  });
 
   const consultants = rows.filter(r=>r[idx.name]).map((r,i)=>{
     const c = {
       id:i, name:r[idx.name], company:r[idx.company]||'', email:r[idx.email]||'',
-      city:r[idx.city]||'', state:r[idx.state]||'', country:r[idx.country]||'',
+      submitted:parseSubmitted(r[idx.submitted]),
       sizes:{}, sizePref:{}, topics:{}, workApproach:{}, sme:[], smeOtherText:'',
       network:[], availability:{}, services:[], servicesOtherText:'', collab:{}, note:''
     };
-    SIZE_ORDER.forEach(s=>{ c.sizes[s]={v1:false,v2:false}; c.sizePref[s]={preferred:false, likely:false}; });
+    SIZE_ORDER.forEach(s=>{ c.sizes[s]={v1:false,v2:false}; c.sizePref[s]={preferred:false,likely:false}; });
     sizeCols.forEach(col=>{
-      const version = col.parts[0].startsWith('v1') ? 'v1':'v2';
-      if(r[col.index]) c.sizes[col.parts[1]][version] = true;
+      const v = col.parts[0].startsWith('v1')?'v1':'v2';
+      if(!c.sizes[col.parts[1]]) c.sizes[col.parts[1]]={v1:false,v2:false};
+      if(r[col.index]) c.sizes[col.parts[1]][v]=true;
     });
     sizePrefCols.forEach(col=>{
-      const attr = col.parts[0].startsWith('Preferred') ? 'preferred':'likely';
-      if(r[col.index]) c.sizePref[col.parts[1]][attr] = true;
+      const a = col.parts[0].startsWith('Preferred')?'preferred':'likely';
+      if(!c.sizePref[col.parts[1]]) c.sizePref[col.parts[1]]={preferred:false,likely:false};
+      if(r[col.index]) c.sizePref[col.parts[1]][a]=true;
     });
-    topicCols.forEach(col=>{ if(r[col.index]) c.topics[col.parts[0]] = r[col.index]; });
+    topicCols.forEach(col=>{ if(r[col.index]) c.topics[col.parts[0]]=r[col.index]; });
     workTypes.forEach(t=>c.workApproach[t]={});
-    workCols.forEach(col=>{
-      const mode = MODE_MAP[col.parts[0]];
-      if(r[col.index]) c.workApproach[col.parts[1]][mode]=true;
-    });
+    workCols.forEach(col=>{ const m=MODE_MAP[col.parts[0]]; if(m && r[col.index]) c.workApproach[col.parts[1]][m]=true; });
     smeCols.forEach(col=>{ if(r[col.index]) c.sme.push(col.parts[0]); });
-    smeOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.smeOtherText = r[p.textIdx]; });
+    smeOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.smeOtherText=r[p.textIdx]; });
     networkCols.forEach(col=>{ if(r[col.index]) c.network.push(col.parts[0]); });
-    availCols.forEach(col=>{ if(r[col.index]) c.availability[col.parts[0]] = r[col.index]; });
+    availCols.forEach(col=>{ if(r[col.index]) c.availability[col.parts[0]]=r[col.index]; });
     servicesCols.forEach(col=>{ if(r[col.index]) c.services.push(col.parts[0]); });
-    servicesOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.servicesOtherText = r[p.textIdx]; });
-    collabCols.forEach(col=>{ if(r[col.index]) c.collab[col.parts[0]] = r[col.index]; });
+    servicesOther.forEach(p=>{ if(r[p.checkIdx] && r[p.textIdx]) c.servicesOtherText=r[p.textIdx]; });
+    collabCols.forEach(col=>{ if(r[col.index]) c.collab[col.parts[0]]=r[col.index]; });
     if(noteCol) c.note = r[noteCol.index]||'';
     return c;
   });
 
-  return {
-    consultants,
-    options:{ workTypes, topicNames, smeOptions, networkOptions, availTypes, availTimeframes, serviceOptions, collabTypes }
-  };
+  return {consultants, lastUpdated,
+    options:{workTypes, topicNames, smeOptions, networkOptions, availTypes, availTimeframes, serviceOptions, collabTypes}};
 }
 
 /* ============================================================
    3. STATE
    ============================================================ */
 let DATA = null;
-
 const state = {
   search:'',
-  sizes:new Set(),        // "Large|v2" or "Large|preferred" style keys
-  topicMin:{},            // topicName -> level string
-  work:new Set(),         // "workType|mode" keys
+  sizes:new Set(),     // "Large|v2" | "Large|pref" | "Large|support" | "Large|v1"
+  topicMin:{},         // topic -> minimum level string
+  work:new Set(),      // "workType|mode"
   sme:new Set(),
   network:new Set(),
-  avail:new Set(),        // "supportType|timeframe" keys
+  avail:new Set(),     // "supportType|timeframe"
   services:new Set(),
-  collab:new Set(),       // structureType, satisfied if Yes/Maybe
+  collab:new Set(),
   sort:'score'
 };
 
 /* ============================================================
-   4. FILTER PANEL RENDERING
+   4. FILTER PANEL
    ============================================================ */
 function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
+function section(id, title, help, inner, open){
+  return el(`<details class="fsection" ${open?'open':''}>
+    <summary><span class="title">${title}</span><span class="cnt" data-cnt="${id}"></span></summary>
+    <div class="body"><p class="help">${help}</p>${inner}</div></details>`);
+}
+function checkList(group, options){
+  return `<div class="chip-row">${options.map(o=>`<label class="chk"><input type="checkbox" data-group="${group}" data-key="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
+}
 
 function renderFilters(){
   const wrap = document.getElementById('filterSections');
   wrap.innerHTML = '';
+  const O = DATA.options;
 
-  // -- Company size + standards version --
-  const sizeRows = SIZE_ORDER.map(s=>`
-    <tr>
-      <td class="rowlabel">${s}</td>
-      <td><input type="checkbox" data-group="sizes" data-key="${s}|v1"></td>
-      <td><input type="checkbox" data-group="sizes" data-key="${s}|v2"></td>
-      <td class="gstart"><input type="checkbox" data-group="sizes" data-key="${s}|preferred"></td>
-      <td><input type="checkbox" data-group="sizes" data-key="${s}|likely"></td>
-    </tr>`).join('');
-  wrap.appendChild(el(`
-    <details class="fsection" open>
-      <summary>Company Size &amp; Standards - Experience &amp; Preference</summary>
-      <div class="body">
-        <ul class="help">
-          <li><strong>Experience</strong> – Indicates which company sizes a consultant has worked with under each version of the Standards.</li>
-          <li><strong>Preference</strong> – Indicates which company sizes a consultant prefers to work with (Yes) and where they are likely to want support from another consultant (Maybe).</li>
-        </ul>
-        <p class="help">Checking multiple boxes shows consultants who match at least one of them.</p>
-        <table class="gridpick">
-          <tr><th></th><th class="group" colspan="2">Experience</th><th class="group gstart" colspan="2">Preference</th></tr>
-          <tr><th></th><th>v1</th><th>v2</th><th class="gstart">Yes</th><th>Maybe</th></tr>
-          ${sizeRows}
-        </table>
-      </div>
-    </details>`));
+  // Company size: experience + preference merged into one matrix
+  wrap.appendChild(section('sizes','Company size &amp; standards',
+    'Check any cells that matter. Experience columns (v1/v2) are one requirement; "Prefers" and "Likely to want support" are each separate requirements, and a consultant must meet every requirement you use.',
+    `<table class="gridpick">
+      <tr><th></th>${SIZE_COLS.map(c=>`<th>${c.head}</th>`).join('')}</tr>
+      ${SIZE_ORDER.map(s=>`<tr><td class="rowlabel">${esc(s)}</td>${SIZE_COLS.map(c=>
+        `<td><input type="checkbox" data-group="sizes" data-key="${esc(s)}|${c.key}" aria-label="${esc(s)}: ${c.head}"></td>`).join('')}</tr>`).join('')}
+    </table>`, true));
 
-  // -- Impact topic depth --
-  const topicRows = DATA.options.topicNames.map(t=>`
-    <tr>
-      <td class="rowlabel">${t}</td>
-      ${LEVEL_ORDER.map(l=>`<td><input type="radio" name="topic-${t}" data-group="topicPick" data-topic="${t}" data-level="${l}" title="${l}"></td>`).join('')}
-    </tr>`).join('');
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Impact Topic Knowledge</summary>
-      <div class="body">
-        <p class="help">Pick the minimum depth of knowledge you need for the specific topic. Consultants with a depth of knowledge exceeding the selection will automatically be included.
+  // Impact topic: pick the minimum depth per topic
+  wrap.appendChild(section('topic','Impact topic depth of knowledge',
+    'Pick the minimum depth you need for each topic that matters. Click a selected circle again to clear it.',
+    `<table class="gridpick">
+      <tr><th></th>${LEVEL_HEAD.map(h=>`<th>${h}</th>`).join('')}</tr>
+      ${O.topicNames.map((t,i)=>`<tr><td class="rowlabel">${esc(t)}</td>${LEVEL_ORDER.map((l,j)=>
+        `<td><input type="radio" name="topic_${i}" data-group="topic" data-row="${esc(t)}" data-level="${esc(l)}" aria-label="${esc(t)}: at least ${LEVEL_HEAD[j]}"></td>`).join('')}</tr>`).join('')}
+    </table>`, false));
 
-This field reflects a consultants ability to interpret the standards, evaluate documentation relative to the standards, and ability to complete client deliverables. Click a selected circle again to clear it.</p>
-        <table class="gridpick levels">
-          <tr>
-            <th rowspan="2"></th>
-            <th rowspan="2">Familiar with basic concepts</th>
-            <th class="group" colspan="2">Comfortable verifying:</th>
-            <th rowspan="2">Could lead a workshop</th>
-          </tr>
-          <tr><th>MOST standards</th><th>ALL standards</th></tr>
-          ${topicRows}
-        </table>
-      </div>
-    </details>`));
+  // Approach
+  wrap.appendChild(section('work','How they approach the work',
+    'Find people by the kind of work and how hands-on they are with it.',
+    `<table class="gridpick">
+      <tr><th></th>${MODE_KEYS.map(m=>`<th>${MODE_HEAD[m]}</th>`).join('')}</tr>
+      ${O.workTypes.map(t=>`<tr><td class="rowlabel">${esc(t)}</td>${MODE_KEYS.map(m=>
+        `<td><input type="checkbox" data-group="work" data-key="${esc(t)}|${m}" aria-label="${esc(t)}: ${MODE_HEAD[m]}"></td>`).join('')}</tr>`).join('')}
+    </table>`, false));
 
-  // -- Work approach --
-  const modeKeys = Object.keys(MODE_LABELS);
-  const workRows = DATA.options.workTypes.map(t=>`
-    <tr>
-      <td class="rowlabel">${t}</td>
-      ${modeKeys.map(m=>`<td><input type="checkbox" data-group="work" data-key="${t}|${m}" title="${MODE_LABELS[m]}"></td>`).join('')}
-    </tr>`).join('');
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Work Approach</summary>
-      <div class="body">
-        <p class="help">This reflects the type of work a consultant does on a typical B Corp certification. Checking multiple boxes shows consultants who match at least one of them.</p>
-        <div class="matrix-scroll">
-        <table class="gridpick levels modes">
-          <tr><th></th>${modeKeys.map(m=>`<th>${MODE_LABELS[m]}</th>`).join('')}</tr>
-          ${workRows}
-        </table>
-        </div>
-      </div>
-    </details>`));
+  wrap.appendChild(section('sme','Willing to advise other consultants',
+    'Useful when you need someone else\'s expertise, and whether you\'d expect to pay for it.',
+    checkList('sme', O.smeOptions), false));
 
-  // -- Mentoring interest --
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Mentoring / Thought Partner</summary>
-      <div class="body">
-        <p class="help">Determine if and how another consultant is willing to provide advice and support.</p>
-        <div class="chip-row">
-          ${DATA.options.smeOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="sme" data-key="${o}"> ${o}</label>`).join('')}
-        </div>
-      </div>
-    </details>`));
+  wrap.appendChild(section('network','Support they want to receive',
+    'Match with consultants looking for the same kind of collaboration you are.',
+    checkList('network', O.networkOptions), false));
 
-  // -- What they want from the network (useful for finding peers with shared goals) --
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Offer Support</summary>
-      <div class="body">
-        <p class="help">Use this filter if you want to offer support to another consultant. This field indicates the type of support a consultant would like to receive from a partner.</p>
-        <div class="chip-row">
-          ${DATA.options.networkOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="network" data-key="${o}"> ${o}</label>`).join('')}
-        </div>
-      </div>
-    </details>`));
+  // Availability
+  const tfs = O.availTimeframes;
+  wrap.appendChild(section('avail','Support they can give, and when',
+    'Pick the kind of help you need and the timeframe you need it in.',
+    tfs.length ? `<table class="gridpick">
+      <tr><th></th>${tfs.map(tf=>`<th>${esc(tf)}</th>`).join('')}</tr>
+      ${O.availTypes.map(t=>`<tr><td class="rowlabel">${esc(t)}</td>${tfs.map(tf=>
+        `<td><input type="checkbox" data-group="avail" data-key="${esc(t)}|${esc(tf)}" aria-label="${esc(t)}: ${esc(tf)}"></td>`).join('')}</tr>`).join('')}
+    </table>` : '<p class="muted">No upcoming timeframes in the data yet.</p>', false));
 
-  // -- Availability --
-  const availRows = DATA.options.availTypes.map(t=>`
-    <div class="topicrow">
-      <span class="tname">${t}</span>
-      <div class="chip-row">
-        ${DATA.options.availTimeframes.map(tf=>`<label class="chk"><input type="checkbox" data-group="avail" data-key="${t}|${tf}"> ${tf}</label>`).join('')}
-      </div>
-    </div>`).join('');
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Request Support</summary>
-      <div class="body">
-        <p class="help">Use this filter to select the support you want to request from a consultant.</p>
-        ${availRows}
-      </div>
-    </details>`));
+  wrap.appendChild(section('services','Services beyond B Corp certification',
+    'Handy when a project needs skills beyond the certification itself.',
+    checkList('services', O.serviceOptions), false));
 
-  // -- Services beyond B Corp --
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Other Services</summary>
-      <div class="body">
-        <p class="help">These are services that consultants provide beyond B Corp Certification.</p>
-        <div class="chip-row">
-          ${DATA.options.serviceOptions.map(o=>`<label class="chk"><input type="checkbox" data-group="services" data-key="${o}"> ${o}</label>`).join('')}
-        </div>
-      </div>
-    </details>`));
+  wrap.appendChild(section('collab','Preferred way of collaborating',
+    'Shows people open (yes or maybe) to that kind of arrangement.',
+    checkList('collab', O.collabTypes), false));
 
-  // -- Collaboration structure --
-  wrap.appendChild(el(`
-    <details class="fsection">
-      <summary>Collaboration Preference</summary>
-      <div class="body">
-        <p class="help">This field indicates how a consultant prefers to partner on projects.</p>
-        <div class="chip-row">
-          ${DATA.options.collabTypes.map(o=>`<label class="chk"><input type="checkbox" data-group="collab" data-key="${o}"> ${o}</label>`).join('')}
-        </div>
-      </div>
-    </details>`));
-
-  wrap.querySelectorAll('input[type="checkbox"][data-group]:not([data-group="topicPick"])').forEach(inp=>{
-    inp.addEventListener('change', onCheckboxChange);
-  });
-  // Impact topic matrix: one minimum level per topic; clicking the selected circle again clears the row
-  wrap.querySelectorAll('input[data-group="topicPick"]').forEach(inp=>{
+  wrap.querySelectorAll('input[type="checkbox"][data-group]').forEach(inp=>inp.addEventListener('change', onCheckboxChange));
+  wrap.querySelectorAll('input[data-group="topic"]').forEach(inp=>{
     inp.addEventListener('click', ()=>{
-      const t = inp.dataset.topic;
-      if(state.topicMin[t] === inp.dataset.level){
-        inp.checked = false;
-        delete state.topicMin[t];
-      } else {
-        state.topicMin[t] = inp.dataset.level;
-      }
+      const t=inp.dataset.row, lvl=inp.dataset.level;
+      if(state.topicMin[t]===lvl){ inp.checked=false; delete state.topicMin[t]; }
+      else state.topicMin[t]=lvl;
       renderResults();
     });
   });
 }
-
 function onCheckboxChange(e){
-  const group = e.target.dataset.group;
-  const key = e.target.dataset.key;
-  const set = state[group];
+  const set = state[e.target.dataset.group], key = e.target.dataset.key;
   if(e.target.checked) set.add(key); else set.delete(key);
   renderResults();
+}
+function updateCounts(){
+  const n = {sizes:state.sizes.size, topic:Object.keys(state.topicMin).length, work:state.work.size,
+    sme:state.sme.size, network:state.network.size, avail:state.avail.size, services:state.services.size, collab:state.collab.size};
+  document.querySelectorAll('[data-cnt]').forEach(s=>{ const v=n[s.dataset.cnt]; s.textContent = v ? v : ''; });
 }
 
 /* ============================================================
    5. MATCHING
    ============================================================ */
-function levelRank(l){ return LEVEL_ORDER.indexOf(l); }
-
-// returns {active: bool sections used, satisfied, total} scoring info per consultant
-function scoreConsultant(c){
-  let satisfied = 0, total = 0;
-  let sectionsFailed = 0, sectionsActive = 0;
-
-  // sizes: OR within section
-  if(state.sizes.size){
-    sectionsActive++;
-    let any=false;
-    state.sizes.forEach(key=>{
-      const [size,ver] = key.split('|');
-      total++;
-      // v1/v2 = standards experience; preferred/likely = size preference
-      const src = (ver==='preferred'||ver==='likely') ? c.sizePref : c.sizes;
-      if(src[size] && src[size][ver]){ satisfied++; any=true; }
-    });
-    if(!any) sectionsFailed++;
-  }
-
-  // topics: minimum level, OR-within-section for "does it satisfy at least one requested topic"
-  const topicKeys = Object.keys(state.topicMin);
-  if(topicKeys.length){
-    sectionsActive++;
-    let any=false;
-    topicKeys.forEach(t=>{
-      total++;
-      const need = levelRank(state.topicMin[t]);
-      const have = levelRank(c.topics[t]);
-      if(have>=0 && have>=need){ satisfied++; any=true; }
-    });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.work.size){
-    sectionsActive++;
-    let any=false;
-    state.work.forEach(key=>{
-      total++;
-      const [type,mode] = key.split('|');
-      if(c.workApproach[type] && c.workApproach[type][mode]){ satisfied++; any=true; }
-    });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.sme.size){
-    sectionsActive++;
-    let any=false;
-    state.sme.forEach(k=>{ total++; if(c.sme.includes(k)){satisfied++; any=true;} });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.network.size){
-    sectionsActive++;
-    let any=false;
-    state.network.forEach(k=>{ total++; if(c.network.includes(k)){satisfied++; any=true;} });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.avail.size){
-    sectionsActive++;
-    let any=false;
-    state.avail.forEach(key=>{
-      const [type,tf]=key.split('|');
-      total++;
-      if(c.availability[type]===tf){ satisfied++; any=true; }
-    });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.services.size){
-    sectionsActive++;
-    let any=false;
-    state.services.forEach(k=>{ total++; if(c.services.includes(k)){satisfied++; any=true;} });
-    if(!any) sectionsFailed++;
-  }
-
-  if(state.collab.size){
-    sectionsActive++;
-    let any=false;
-    state.collab.forEach(k=>{
-      total++;
-      const v = c.collab[k];
-      if(v==='Yes' || v==='Maybe'){ satisfied++; any=true; }
-    });
-    if(!any) sectionsFailed++;
-  }
-
-  const pct = total ? Math.round((satisfied/total)*100) : null;
-  return { pct, sectionsActive, sectionsFailed, qualifies: sectionsFailed===0 };
+const levelRank = l => LEVEL_ORDER.indexOf(l);
+function sizeCell(c, size, key){
+  if(key==='v1') return !!(c.sizes[size] && c.sizes[size].v1);
+  if(key==='v2') return !!(c.sizes[size] && c.sizes[size].v2);
+  if(key==='pref') return !!(c.sizePref[size] && c.sizePref[size].preferred);
+  if(key==='support') return !!(c.sizePref[size] && c.sizePref[size].likely);
+  return false;
+}
+function topicMeets(c, t){
+  const need = levelRank(state.topicMin[t]), have = levelRank(c.topics[t]);
+  return have>=0 && have>=need;
 }
 
+function scoreConsultant(c){
+  const groups = [];
+  const g = (items, test)=>{
+    if(!items.length) return;
+    let sat=0; items.forEach(i=>{ if(test(i)) sat++; });
+    groups.push({total:items.length, sat});
+  };
+  const sz = [...state.sizes].map(k=>k.split('|'));
+  const szTest = ([s,col])=>sizeCell(c,s,col);
+  g(sz.filter(([,col])=>col==='v1'||col==='v2'), szTest);   // experience = one requirement
+  g(sz.filter(([,col])=>col==='pref'), szTest);              // preference = its own requirement
+  g(sz.filter(([,col])=>col==='support'), szTest);           // wants-support = its own requirement
+  g(Object.keys(state.topicMin), t=>topicMeets(c,t));
+  g([...state.work].map(k=>k.split('|')), ([t,m])=>!!(c.workApproach[t] && c.workApproach[t][m]));
+  g([...state.sme], k=>c.sme.includes(k));
+  g([...state.network], k=>c.network.includes(k));
+  g([...state.avail].map(k=>k.split('|')), ([t,tf])=>c.availability[t]===tf);
+  g([...state.services], k=>c.services.includes(k));
+  g([...state.collab], k=>{ const v=c.collab[k]; return v==='Yes'||v==='Maybe'; });
+
+  // Meeting a requirement earns at least half credit; matching more of the options checked
+  // within it earns the rest. So someone who meets every requirement is never "Partial".
+  const pct = groups.length
+    ? Math.round(groups.reduce((a,x)=>a+(x.sat ? 0.5+0.5*x.sat/x.total : 0),0)/groups.length*100)
+    : null;
+  return {pct, qualifies: groups.every(x=>x.sat>0)};
+}
 function badgeFor(pct){
   if(pct===100) return {cls:'full', label:'Full match'};
-  if(pct>=60) return {cls:'strong', label:'Strong match'};
+  if(pct>=75) return {cls:'strong', label:'Strong match'};
   return {cls:'partial', label:'Partial match'};
 }
 
 /* ============================================================
-   6. RESULTS RENDERING
+   6. VISUAL BUILDING BLOCKS
+   ============================================================ */
+function sizeGridHTML(c, highlight){
+  let h = `<div class="sgrid"><div></div>${SIZE_ORDER.map(s=>`<div class="sh">${SIZE_SHORT[s]}</div>`).join('')}`;
+  SIZE_COLS.forEach(col=>{
+    h += `<div class="sl">${col.row}</div>`;
+    SIZE_ORDER.forEach(s=>{
+      const on = sizeCell(c,s,col.key);
+      const hit = highlight && on && state.sizes.has(`${s}|${col.key}`);
+      h += `<div class="sc ${col.cls} ${on?'on':''} ${hit?'hit':''}" title="${esc(s)}: ${col.row}${on?' (yes)':''}">${on?'✓':''}</div>`;
+    });
+  });
+  return h + '</div>';
+}
+
+function topicAbbr(t){
+  const m = /\(([A-Za-z]+)\)\s*$/.exec(t);
+  return m ? m[1] : t.split(/\s+/).map(w=>w[0]).join('').toUpperCase();
+}
+function topicTilesHTML(c, highlight){
+  return `<div class="tgrid">${DATA.options.topicNames.map(t=>{
+    const lvl = c.topics[t], r = levelRank(lvl);
+    const hit = highlight && state.topicMin[t] && topicMeets(c,t);
+    return `<div class="tile ${r>=0?'l'+r:''} ${hit?'hit':''}" title="${esc(t)}: ${esc(lvl||'Not answered')}">
+      <span class="ab">${esc(topicAbbr(t))}</span><span class="lv">${r>=0?LEVEL_SHORT[r]:'–'}</span></div>`;
+  }).join('')}</div>`;
+}
+
+function offerGroups(c){
+  const g = {};
+  Object.entries(c.availability).forEach(([t,tf])=>{ if(tf!==NOT_INTERESTED) (g[tf]=g[tf]||[]).push(t); });
+  const order = Object.keys(g).sort((a,b)=> a===AVAIL_NOW ? -1 : b===AVAIL_NOW ? 1 : tfCompare(a,b));
+  return order.map(tf=>({tf, label: tf===AVAIL_NOW ? (c.submitted ? `Open when surveyed (${fmtDate(c.submitted)})` : 'Open when surveyed') : tf, items:g[tf]}));
+}
+function capList(items, cap){
+  if(!cap || items.length<=cap+1) return items.map(esc).join(', ');
+  return items.slice(0,cap).map(esc).join(', ') + ` <span class="muted">+${items.length-cap} more</span>`;
+}
+function chipsHTML(items, cap){
+  if(!items.length) return '<span class="muted">None listed.</span>';
+  const shown = (cap && items.length>cap+1) ? items.slice(0,cap) : items;
+  let h = shown.map(i=>`<span class="chip">${esc(i)}</span>`).join('');
+  if(shown.length<items.length) h += `<span class="muted" style="align-self:center">+${items.length-shown.length} more</span>`;
+  return `<div class="chips">${h}</div>`;
+}
+function supportBlocksHTML(c, full){
+  const offers = offerGroups(c);
+  const offerHtml = offers.length
+    ? offers.map(o=>`<div class="gline"><span class="gtf">${esc(o.label)}</span>${capList(o.items, full?0:3)}</div>`).join('')
+    : '<span class="muted">None listed.</span>';
+  return `
+    <div class="blk"><div class="blk-h">Support they can give</div>${offerHtml}</div>
+    <div class="blk"><div class="blk-h">Support they want to receive</div>${chipsHTML(c.network, full?0:4)}</div>
+    <div class="blk"><div class="blk-h">Open to advising others</div>${chipsHTML(c.sme, full?0:3)}</div>`;
+}
+
+/* ============================================================
+   7. RESULTS
    ============================================================ */
 function matchesSearch(c){
   if(!state.search) return true;
-  const q = state.search.toLowerCase();
-  return (c.name+' '+c.company+' '+c.note).toLowerCase().includes(q);
+  return (c.name+' '+c.company+' '+c.note).toLowerCase().includes(state.search.toLowerCase());
 }
-
-function topExpertiseTags(c){
-  return Object.entries(c.topics)
-    .filter(([,lvl])=>levelRank(lvl)>=2)
-    .map(([topic])=>topic.replace(/\s*\([A-Z]+\)$/,''));
-}
-
-function sizesWorkedTags(c){
-  return SIZE_ORDER.filter(s=>c.sizes[s].v1||c.sizes[s].v2)
-    .map(s=>{
-      const v = [];
-      if(c.sizes[s].v1) v.push('v1');
-      if(c.sizes[s].v2) v.push('v2');
-      return `${s} (${v.join('/')})`;
-    });
+function anyFilterActive(){
+  return state.sizes.size||Object.keys(state.topicMin).length||state.work.size||state.sme.size||state.network.size||state.avail.size||state.services.size||state.collab.size;
 }
 
 function renderResults(){
-  const anyActive = state.sizes.size||Object.keys(state.topicMin).length||state.work.size||state.sme.size||state.network.size||state.avail.size||state.services.size||state.collab.size;
-
-  let list = DATA.consultants.filter(matchesSearch).map(c=>{
-    const s = scoreConsultant(c);
-    return {c, s};
-  });
-
-  if(anyActive){
-    list = list.filter(x=>x.s.qualifies);
-  }
-
-  if(state.sort==='score' && anyActive){
-    list.sort((a,b)=> (b.s.pct ?? 0) - (a.s.pct ?? 0) || a.c.name.localeCompare(b.c.name));
-  } else {
-    list.sort((a,b)=>a.c.name.localeCompare(b.c.name));
-  }
+  updateCounts();
+  const anyActive = anyFilterActive();
+  let list = DATA.consultants.filter(matchesSearch).map(c=>({c, s:scoreConsultant(c)}));
+  if(anyActive) list = list.filter(x=>x.s.qualifies);
+  if(state.sort==='score' && anyActive) list.sort((a,b)=>(b.s.pct||0)-(a.s.pct||0)||a.c.name.localeCompare(b.c.name));
+  else list.sort((a,b)=>a.c.name.localeCompare(b.c.name));
 
   document.getElementById('resultCount').textContent =
-    `${list.length} consultant${list.length===1?'':'s'} ${anyActive ? 'match your criteria' : 'in the directory'}`;
+    `${list.length} consultant${list.length===1?'':'s'} ${anyActive?'match your criteria':'in the directory'}`;
 
   const cardsEl = document.getElementById('cards');
   if(!list.length){
     cardsEl.innerHTML = `<div class="empty">No one matches all of those filters yet. Try loosening a criterion, or check back after the next data update.</div>`;
     return;
   }
-
   cardsEl.innerHTML = list.map(({c,s})=>{
     const badge = anyActive && s.pct!==null ? badgeFor(s.pct) : null;
-    const loc = [c.city,c.state,c.country].filter(Boolean).join(', ');
-    const exp = topExpertiseTags(c).slice(0,4);
-    const sizes = sizesWorkedTags(c).slice(0,4);
-    return `
-    <div class="card">
+    return `<div class="card">
       <div class="card-top">
-        <div>
-          <h3>${c.name}</h3>
-          <div class="company">${c.company}</div>
-          ${loc?`<div class="loc">${loc}</div>`:''}
-        </div>
+        <div><h3>${esc(c.name)}</h3><div class="company">${esc(c.company)}</div></div>
         ${badge?`<span class="badge ${badge.cls}">${badge.label}</span>`:''}
       </div>
-      <div class="tags">
-        ${sizes.map(t=>`<span class="tag">${t}</span>`).join('')}
-        ${exp.map(t=>`<span class="tag alt">${t}</span>`).join('')}
-      </div>
+      <div class="blk"><div class="blk-h">Company size</div>${sizeGridHTML(c,true)}</div>
+      <div class="blk"><div class="blk-h">Impact topic depth</div>${topicTilesHTML(c,true)}</div>
+      <div class="support">${supportBlocksHTML(c,false)}</div>
       <div class="card-actions">
         <button class="primary" onclick="openProfile(${c.id})">View full profile</button>
-        ${c.email?`<a href="mailto:${c.email}">Email</a>`:''}
+        ${c.email?`<a href="mailto:${esc(c.email)}">Email</a>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
 /* ============================================================
-   7. PROFILE MODAL
+   8. PROFILE MODAL
    ============================================================ */
+function approachGridHTML(c){
+  let h = `<div class="mgrid"><div></div>${MODE_KEYS.map(m=>`<div class="mh">${MODE_HEAD[m]}</div>`).join('')}`;
+  DATA.options.workTypes.forEach(t=>{
+    h += `<div class="ml">${esc(t.trim())}</div>`;
+    MODE_KEYS.forEach(m=>{
+      const on = !!(c.workApproach[t] && c.workApproach[t][m]);
+      const hit = on && state.work.has(`${t}|${m}`);
+      h += `<div class="mc ${on?'on':''} ${hit?'hit':''}" title="${esc(t.trim())}: ${MODE_HEAD[m]}">${on?'✓':''}</div>`;
+    });
+  });
+  return h + '</div>';
+}
+
 function openProfile(id){
   const c = DATA.consultants.find(x=>x.id===id);
-  const loc = [c.city,c.state,c.country].filter(Boolean).join(', ');
-
-  const sizesHtml = SIZE_ORDER.map(s=>{
-    const w = c.sizes[s];
-    const p = c.sizePref[s];
-    if(!w.v1 && !w.v2 && !p.preferred && !p.likely) return '';
-    let bits = [];
-    if(w.v1) bits.push('v1 experience');
-    if(w.v2) bits.push('v2 experience');
-    if(p.preferred) bits.push('preferred size');
-    if(p.likely) bits.push('likely to want support here');
-    return `<div>${s}: ${bits.join(', ')}</div>`;
-  }).filter(Boolean).join('') || '<div>No sizes indicated.</div>';
-
-  const topicsHtml = Object.entries(c.topics).map(([t,l])=>`<div><span>${t}:</span> ${l}</div>`).join('') || '<div>Not answered.</div>';
-
-  const workHtml = Object.entries(c.workApproach).map(([type,modes])=>{
-    const active = Object.keys(modes);
-    if(!active.length) return '';
-    return `<div>${type}: ${active.map(m=>MODE_LABELS[m]).join('; ')}</div>`;
-  }).filter(Boolean).join('') || '<div>Not answered.</div>';
-
-  const availHtml = Object.entries(c.availability).map(([t,tf])=>`<div>${t}: ${tf}</div>`).join('') || '<div>Not answered.</div>';
-  const collabHtml = Object.entries(c.collab).map(([t,v])=>`<div>${t}: ${v}</div>`).join('') || '<div>Not answered.</div>';
-
+  const collab = Object.entries(c.collab).map(([t,v])=>`${t}: ${v}`);
   document.getElementById('modalBody').innerHTML = `
-    <button class="close" onclick="closeProfile()">&times;</button>
-    <h2>${c.name}</h2>
-    <div class="company" style="color:var(--ink-soft)">${c.company}${loc?' · '+loc:''}</div>
-    ${c.email?`<div style="margin-top:0.3rem;"><a href="mailto:${c.email}">${c.email}</a></div>`:''}
+    <button class="close" onclick="closeProfile()" aria-label="Close">&times;</button>
+    <h2>${esc(c.name)}</h2>
+    <div style="color:var(--ink-soft)">${esc(c.company)}</div>
+    ${c.email?`<div style="margin-top:.3rem;"><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></div>`:''}
 
-    <section>
-      <h4>Company Size &amp; Standards - Experience &amp; Preference</h4>
-      <div class="kv" style="grid-template-columns:1fr;">${sizesHtml}</div>
-    </section>
-    <section>
-      <h4>Impact Topic Knowledge</h4>
-      <div class="kv" style="grid-template-columns:1fr;">${topicsHtml}</div>
-    </section>
-    <section>
-      <h4>Work Approach</h4>
-      <div class="kv" style="grid-template-columns:1fr;">${workHtml}</div>
-    </section>
-    <section>
-      <h4>Mentoring / Thought Partner</h4>
-      <div class="tags">${c.sme.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
-      ${c.smeOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.smeOtherText}</div>`:''}
-    </section>
-    <section>
-      <h4>Offer Support</h4>
-      <div class="tags">${c.network.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
-    </section>
-    <section>
-      <h4>Request Support</h4>
-      <div class="kv" style="grid-template-columns:1fr;">${availHtml}</div>
-    </section>
-    <section>
-      <h4>Other Services</h4>
-      <div class="tags">${c.services.map(s=>`<span class="tag alt">${s}</span>`).join('') || '<span>Not answered.</span>'}</div>
-      ${c.servicesOtherText?`<div style="margin-top:0.4rem;font-size:0.85rem;">Other: ${c.servicesOtherText}</div>`:''}
-    </section>
-    <section>
-      <h4>Collaboration Preference</h4>
-      <div class="kv" style="grid-template-columns:1fr;">${collabHtml}</div>
-    </section>
-    ${c.note?`<section><h4>In their own words</h4><div class="notefield">${c.note}</div></section>`:''}
-  `;
+    <section><h4>Company size</h4>${sizeGridHTML(c,true)}</section>
+    <section><h4>Impact topic depth</h4>${topicTilesHTML(c,true)}
+      <div class="legend" style="margin:.6rem 0 0">
+        <span><i class="sw" style="background:var(--lv0)"></i>Basic concepts</span>
+        <span><i class="sw" style="background:var(--lv1)"></i>Verifies most</span>
+        <span><i class="sw" style="background:var(--lv2)"></i>Verifies all</span>
+        <span><i class="sw" style="background:var(--lv3)"></i>Can lead a workshop</span>
+      </div></section>
+    <section><h4>How they approach the work</h4>${approachGridHTML(c)}</section>
+    <section><div class="support" style="margin-top:0">${supportBlocksHTML(c,true)}</div>
+      ${c.smeOtherText?`<div class="muted" style="margin-top:.5rem">Advising, other: ${esc(c.smeOtherText)}</div>`:''}</section>
+    <section><h4>Services beyond B Corp</h4>${chipsHTML(c.services,0)}
+      ${c.servicesOtherText?`<div class="muted" style="margin-top:.5rem">Other: ${esc(c.servicesOtherText)}</div>`:''}</section>
+    <section><h4>Preferred way of collaborating</h4>${chipsHTML(collab,0)}</section>
+    ${c.note?`<section><h4>In their own words</h4><div class="notefield">${esc(c.note)}</div></section>`:''}`;
   document.getElementById('modalBackdrop').classList.add('open');
 }
 function closeProfile(){ document.getElementById('modalBackdrop').classList.remove('open'); }
-document.getElementById('modalBackdrop').addEventListener('click', e=>{
-  if(e.target.id==='modalBackdrop') closeProfile();
-});
+document.getElementById('modalBackdrop').addEventListener('click', e=>{ if(e.target.id==='modalBackdrop') closeProfile(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeProfile(); });
 
 /* ============================================================
-   8. WIRE UP + LOAD
+   9. WIRE UP + LOAD
    ============================================================ */
-document.getElementById('searchBox').addEventListener('input', e=>{
-  state.search = e.target.value;
-  renderResults();
-});
-document.getElementById('sortPick').addEventListener('change', e=>{
-  state.sort = e.target.value;
-  renderResults();
-});
+document.getElementById('searchBox').addEventListener('input', e=>{ state.search=e.target.value; renderResults(); });
+document.getElementById('sortPick').addEventListener('change', e=>{ state.sort=e.target.value; renderResults(); });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  state.search=''; state.sizes.clear(); state.topicMin={}; state.work.clear();
-  state.sme.clear(); state.network.clear(); state.avail.clear();
-  state.services.clear(); state.collab.clear();
+  state.search=''; state.topicMin={};
+  ['sizes','work','sme','network','avail','services','collab'].forEach(k=>state[k].clear());
   document.getElementById('searchBox').value='';
-  renderFilters();
-  renderResults();
+  renderFilters(); renderResults();
 });
 
 fetch('data.csv')
-  .then(r=>{
-    if(!r.ok) throw new Error('data.csv not found (' + r.status + ')');
-    return r.text();
-  })
+  .then(r=>{ if(!r.ok) throw new Error('data.csv not found ('+r.status+')'); return r.text(); })
   .then(text=>{
-    const parsed = Papa.parse(text, {skipEmptyLines:true});
-    const rows = parsed.data;
-    const headers = rows[0];
-    const dataRows = rows.slice(1);
-    DATA = buildData(headers, dataRows);
-
+    const rows = Papa.parse(text.replace(/^\uFEFF/,''), {skipEmptyLines:true}).data;
+    DATA = buildData(rows[0], rows.slice(1));
     document.getElementById('loadingMsg').style.display='none';
     document.getElementById('appLayout').style.display='grid';
-    document.getElementById('statLine').textContent =
-      `${DATA.consultants.length} consultant${DATA.consultants.length===1?'':'s'} in the directory · updated whenever data.csv is replaced`;
-
+    document.getElementById('statLine').textContent = DATA.lastUpdated ? `Last updated ${fmtDate(DATA.lastUpdated,true)}` : '';
     renderFilters();
     renderResults();
   })
@@ -973,7 +704,7 @@ fetch('data.csv')
     document.getElementById('loadingMsg').style.display='none';
     const e = document.getElementById('errorMsg');
     e.style.display='block';
-    e.textContent = 'Could not load data.csv: ' + err.message + '. Make sure data.csv is in the same folder as this page.';
+    e.textContent = 'Could not load data.csv: '+err.message+'. Make sure data.csv is in the same folder as this page and that you are viewing the page over http(s), not by double-clicking the file.';
   });
 </script>
 </body>
