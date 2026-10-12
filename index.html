@@ -122,8 +122,8 @@
   .sc{height:22px;border-radius:4px;background:var(--empty);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;}
   .sc.on.v1{background:#86AD9C;}
   .sc.on.v2{background:#2F5B50;}
-  .sc.on.pref{background:#3F6E9E;}
-  .sc.on.supp{background:#6C5FA3;}
+  .sc.on.pref{background:#86AD9C;}
+  .sc.on.supp{background:#2F5B50;}
   .sc.hit, .tile.hit, .mc.hit{outline:2px solid var(--ink);outline-offset:1px;}
 
   /* impact-topic tiles */
@@ -662,7 +662,10 @@ function renderResults(){
    ============================================================ */
 function approachGridHTML(c){
   let h = `<div class="mgrid"><div></div>${MODE_KEYS.map(m=>`<div class="mh">${MODE_LABELS[m]}</div>`).join('')}`;
-  DATA.options.workTypes.forEach(t=>{
+  // Only list work types this consultant actually selected (many are one-off custom entries)
+  const rows = DATA.options.workTypes.filter(t=>MODE_KEYS.some(m=>c.workApproach[t] && c.workApproach[t][m]));
+  if(!rows.length) return '<div class="muted">Not answered.</div>';
+  rows.forEach(t=>{
     h += `<div class="ml">${esc(t.trim())}</div>`;
     MODE_KEYS.forEach(m=>{
       const on = !!(c.workApproach[t] && c.workApproach[t][m]);
